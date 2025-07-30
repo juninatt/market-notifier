@@ -8,6 +8,7 @@
         <groupId>se.pbt</groupId>
         <artifactId>ddplus</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>notifier-sms</artifactId>
