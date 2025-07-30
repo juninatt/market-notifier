@@ -1,0 +1,7 @@
+server:
+  port: 8081
+
+finnhub:
+  api:
+    base-url: https://finnhub.io/api/v1
+    token: YOUR_FINNHUB_API_TOKEN
