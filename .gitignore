@@ -1,5 +1,9 @@
-target/
+### Maven Wrapper ###
+.mvn/wrapper/MavenWrapperDownloader.java
 !.mvn/wrapper/maven-wrapper.jar
+
+### Build Output ###
+target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
