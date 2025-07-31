@@ -1,0 +1,6 @@
+# TODO: Create separate application-test.yml and configure active profiles for test environment
+
+finnhub:
+  api:
+    base-url: https://finnhub.io/api/v1
+    token: YOUR_FINNHUB_API_TOKEN
