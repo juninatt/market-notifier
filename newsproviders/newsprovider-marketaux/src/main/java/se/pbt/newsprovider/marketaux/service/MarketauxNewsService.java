@@ -28,7 +28,7 @@ public class MarketauxNewsService {
     public Mono<String> fetchLatestNews() {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/v1/news/all")
+                        .path("/news/all")
                         .queryParam("countries", "us")
                         .build())
                 .retrieve()
