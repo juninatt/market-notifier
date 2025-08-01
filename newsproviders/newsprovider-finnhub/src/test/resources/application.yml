@@ -3,4 +3,4 @@
 finnhub:
   api:
     base-url: https://finnhub.io/api/v1
-    token: YOUR_FINNHUB_API_TOKEN
+    token: ${FINNHUB_API_KEY}
