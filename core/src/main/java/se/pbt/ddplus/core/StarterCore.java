@@ -1,4 +1,4 @@
-package se.pbt.core;
+package se.pbt.ddplus.core;
 
 public class StarterCore {
 

@@ -1,4 +1,4 @@
-package se.pbt.newsprovider.finnhub.service;
+package se.pbt.ddplus.newsprovider.marketaux.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -6,30 +6,30 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 /**
- * Service for retrieving general news articles from the Finnhub API.
+ * Service for retrieving news articles from the Marketaux API.
  * <p>
  * Uses an injected {@link WebClient} configured with base URL and token.
  */
 @Service
-public class FinnhubNewsService {
+public class MarketauxNewsService {
 
-    @Qualifier("finnhubClient")
+    @Qualifier("marketauxClient")
     private final WebClient webClient;
 
-    public FinnhubNewsService(WebClient webClient) {
+    public MarketauxNewsService(WebClient webClient) {
         this.webClient = webClient;
     }
 
     /**
-     * Fetches general news from Finnhub as a reactive {@link Mono} of raw JSON string.
+     * Fetches the latest U.S. news from Marketaux as a reactive {@link Mono} of raw JSON string.
      *
      * @return Mono containing the response body from the API
      */
-    public Mono<String> fetchGeneralNews() {
+    public Mono<String> fetchLatestNews() {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/news")
-                        .queryParam("category", "general")
+                        .path("/news/all")
+                        .queryParam("countries", "us")
                         .build())
                 .retrieve()
                 .bodyToMono(String.class);

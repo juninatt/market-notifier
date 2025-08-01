@@ -1,10 +1,10 @@
-package se.pbt.newsprovider.marketaux.service;
+package se.pbt.ddplus.newsprovider.marketaux.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import reactor.core.publisher.Mono;
-import se.pbt.newsprovider.marketaux.config.MarketauxConfig;
+import se.pbt.ddplus.newsprovider.marketaux.config.MarketauxConfig;
 
 // TODO: Use @ActiveProfiles("test") once a test profile with mock API config is set up
 @SpringBootTest(classes = {MarketauxConfig.class, MarketauxNewsService.class})

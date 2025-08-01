@@ -1,4 +1,4 @@
-package se.pbt.newsprovider.finnhub.config;
+package se.pbt.ddplus.newsprovider.finnhub.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

@@ -1,4 +1,4 @@
-package se.pbt.runner;
+package se.pbt.ddplus.runner;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,9 +1,9 @@
-package se.pbt.newsprovider.finnhub.service;
+package se.pbt.ddplus.newsprovider.finnhub.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import se.pbt.newsprovider.finnhub.config.FinnhubConfig;
+import se.pbt.ddplus.newsprovider.finnhub.config.FinnhubConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,11 +16,11 @@ class FinnhubNewsServiceTest {
 
     @Test
     void fetchGeneralNews_shouldReturnNonEmptyResponse() {
-        String response = service.fetchGeneralNews().block(); // Only for testing
+        String response = service.fetchGeneralNews().block();
 
         assertThat(response)
                 .isNotNull()
                 .isNotBlank()
-                .contains("category"); // or "headline", "source" etc depending on data
+                .contains("category");
     }
 }

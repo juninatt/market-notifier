@@ -1,4 +1,4 @@
-package se.pbt.newsprovider.marketaux.config;
+package se.pbt.ddplus.newsprovider.marketaux.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
