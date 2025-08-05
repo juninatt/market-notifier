@@ -20,9 +20,16 @@ In this project, it's used to retrieve broad market-related news headlines.
 Marketaux is a financial news API focused on delivering headline articles filtered by criteria like company, region, or language.
 In this project, it's used to complement Finnhub with more granular or targeted news sources.
 
+### 🧾 User Subscriptions
+
+Users define what news to receive by editing a simple YAML file.
+The application loads this file at runtime and uses the subscriptions to query the correct providers.
+
+By default, it looks for subscriptions.yml in the classpath.
+
 ---
 
-## ⚙️ Configure & Run
+## ⚙️ Configure & Run (in development)
 
 Before running the project, you must provide valid API tokens for both Finnhub and Marketaux. 
 These are required for the system to fetch any news — the application will not start without them.
