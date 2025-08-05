@@ -1,0 +1,13 @@
+subscriptions:
+  - id: "tech-news"
+    provider: "finnhub"
+    keywords:
+      - "Tesla"
+      - "AI"
+      - "Semiconductors"
+
+  - id: "green-energy"
+    provider: "marketaux"
+    keywords:
+      - "solar"
+      - "wind"
