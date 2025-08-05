@@ -1,0 +1,12 @@
+subscriptions:
+  - id: "ai-alerts"
+    provider: "finnhub"
+    keywords:
+      - "AI"
+      - "machine learning"
+
+  - id: "green-news"
+    provider: "marketaux"
+    keywords:
+      - "solar"
+      - "wind"
