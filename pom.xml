@@ -15,6 +15,7 @@
         <module>newsproviders/newsprovider-marketaux</module>
         <module>notifiers/notifier-email</module>
         <module>notifiers/notifier-sms</module>
+        <module>subscription</module>
     </modules>
 
     <properties>
