@@ -18,6 +18,12 @@
         <!-- Project Module Dependencies -->
         <dependency>
             <groupId>se.pbt</groupId>
+            <artifactId>newsprovider-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>se.pbt</groupId>
             <artifactId>core</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>

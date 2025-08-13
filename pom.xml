@@ -3,6 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- TODO: Add ddplus to groupId and adjust child pom-->
     <groupId>se.pbt</groupId>
     <artifactId>ddplus</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -11,6 +12,7 @@
     <modules>
         <module>app-runner</module>
         <module>core</module>
+        <module>newsproviders/newsprovider-common</module>
         <module>newsproviders/newsprovider-finnhub</module>
         <module>newsproviders/newsprovider-marketaux</module>
         <module>notifiers/notifier-email</module>
