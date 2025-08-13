@@ -12,11 +12,8 @@
     <modules>
         <module>app-runner</module>
         <module>core</module>
-        <module>newsproviders/newsprovider-common</module>
-        <module>newsproviders/newsprovider-finnhub</module>
-        <module>newsproviders/newsprovider-marketaux</module>
-        <module>notifiers/notifier-email</module>
-        <module>notifiers/notifier-sms</module>
+        <module>newsprovider</module>
+        <module>notifier</module>
         <module>subscription</module>
     </modules>
 

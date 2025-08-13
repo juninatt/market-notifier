@@ -1,6 +1,0 @@
-# TODO: Create separate application-test.yml and configure active profiles for test environment
-
-marketaux:
-  api:
-    base-url: https://api.marketaux.com/v1
-    token: ${MARKETAUX_API_KEY}
