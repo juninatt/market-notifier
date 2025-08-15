@@ -1,0 +1,12 @@
+package se.pbt.ddplus.notifier.core;
+
+/**
+ * Represents a notification message used as the input model
+ * for sending notifications through different channels.
+ */
+public record Notification(
+        String title,
+        String body,
+        String url
+) {}
+
