@@ -1,8 +1,8 @@
-# DD+ (Due Diligence Plus)
+# DD+ (Due Diligence Plus) (In Development)
 
-DD+ is a personal Java project built with Maven and Spring Boot.  
-The goal is to create a modular, scheduled news subscription service with support for multiple sources (e.g. Finnhub, RSS) 
-and multiple notification channels (email, SMS, push).
+**DD+** is a personal Java project built with Maven and Spring Boot.  
+It provides a modular, scheduled news subscription service with multiple sources (e.g., [Finnhub](https://finnhub.io/), [Marketaux](https://www.marketaux.com/))
+and **delivers notifications via Telegram** using the [Telegram Bot API](https://core.telegram.org/bots/api)
 
 The project focuses on:
 - ✅ Simplicity: no database, all configuration via JSON/YAML
@@ -12,34 +12,47 @@ The project focuses on:
 ###  News providers: 
 
 - **Finnhub**
-Finnhub is a financial data API that offers a wide range of information, including general business news.
-In this project, it's used to retrieve broad market-related news headlines.
+  Finnhub is a financial data API that offers a wide range of information, including general business news.
 
+  - **Marketaux**
+  Marketaux is a financial news API focused on delivering headline articles filtered by criteria like company, region, or language.
 
-- **Marketaux**
-Marketaux is a financial news API focused on delivering headline articles filtered by criteria like company, region, or language.
-In this project, it's used to complement Finnhub with more granular or targeted news sources.
+### Notifiers
 
-### 🧾 User Subscriptions
-
-Users define what news to receive by editing a simple YAML file.
-The application loads this file at runtime and uses the subscriptions to query the correct providers.
-
-By default, it looks for subscriptions.yml in the classpath.
+- **Telegram**  
+  Telegram is a cloud-based chat platform with private chats, large groups, and one-way broadcast channels.
 
 ---
 
-## ⚙️ Configure & Run (in development)
+## ⚙️ Configuration 
 
-Before running the project, you must provide valid API tokens for both Finnhub and Marketaux. 
-These are required for the system to fetch any news — the application will not start without them.
+**Requirements:** Java 17+, Maven, Telegram, Finnhub & MarketAux accounts.
 
-Free tokens are easily obtained at:
+Before running the app you need valid API tokens for **Finnhub**, **Marketaux**, and a **Telegram bot token**.
+
+### 1) Get API keys / tokens
+
+**Finnhub / Marketaux (news sources)**
+- Sign up and create free API keys:
 - [finnhub.io](https://finnhub.io)
 - [marketaux.com](https://marketaux.com)
 
-API tokens are read from environment variables using the following format in `application.yml` in the `app-runner` module:
+**Telegram (notification channel)**
+1. In Telegram, start a chat with **@BotFather**.
+2. Send `/newbot`, follow the prompts (choose a name and a unique username ending in `bot`).
+3. BotFather will reply with your **bot token** — keep it secret.
+4. Start a chat with your new bot so it can message you back.
+5. (Optional: for group delivery) add your bot to the group and send a message in the group.
 
+**Find your chat ID(s)**
+- Quick way: call `getUpdates` and read the `chat.id` from the response.
+  ```bash
+  curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates"
+  ```
+
+### 2) Configure application.yml
+
+The app reads API keys/tokens from environment variables referenced in application.yml (module: app-runner):
 ```yaml
  finnhub:
    api:
@@ -48,33 +61,12 @@ API tokens are read from environment variables using the following format in `ap
  marketaux:
    api:
      token: ${MARKETAUX_API_TOKEN}
+
+ telegram:
+   baseUrl: https://api.telegram.org
+   botToken: ${TELEGRAM_BOT_TOKEN}
+   chatIds: ${TELEGRAM_CHAT_IDS}  # e.g. 123456789,-100987654321
 ```
-
-You can provide them in one of the following ways:
-
-1. **Inline in terminal:**
-
- ```bash
-    FINNHUB_API_TOKEN=your-token MARKETAUX_API_TOKEN=your-token ./mvnw -f app-runner/pom.xml spring-boot:run
- ```
-
-2. **As system environment variables:** (Restart your terminal/IDE after setting.)
-- **Windows**: [Set environment variables](https://learn.microsoft.com/en-us/windows/win32/procthread/environment-variables)
-- **macOS / Linux**: [Set environment variables](https://wiki.archlinux.org/title/environment_variables)   
-
-3. **Inside your IDE's run configuration (as environment variables):** 
-Set the tokens as environment variables in your run configuration.
-
-
-4. **Hardcode directly in application.yml:**
-For local testing only, you can paste the tokens directly in application.yml.
-(Not recommended if the file is tracked in version control.)
-
-### ▶️ Start the application:
-
-1. **Command line: Run the command above from the project root (ddplus/)**
-or
-2. **IDE: Run DDPlusApplication in the app-runner module**
 
 ---
 
