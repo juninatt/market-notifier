@@ -1,4 +1,4 @@
-package se.pbt.ddplus.notifier.telegram;
+package se.pbt.ddplus.notifier.telegram.config;
 
 import lombok.Getter;
 import lombok.Setter;

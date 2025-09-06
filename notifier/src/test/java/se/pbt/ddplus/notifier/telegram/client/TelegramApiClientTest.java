@@ -1,4 +1,4 @@
-package se.pbt.ddplus.notifier.telegram;
+package se.pbt.ddplus.notifier.telegram.client;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;

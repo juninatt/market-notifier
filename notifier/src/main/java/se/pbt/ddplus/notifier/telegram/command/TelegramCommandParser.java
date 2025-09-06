@@ -1,4 +1,4 @@
-package se.pbt.ddplus.notifier.telegram;
+package se.pbt.ddplus.notifier.telegram.command;
 
 import se.pbt.ddplus.core.subscription.SubscribeCommand;
 

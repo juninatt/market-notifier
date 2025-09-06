@@ -1,4 +1,4 @@
-package se.pbt.ddplus.notifier.telegram;
+package se.pbt.ddplus.notifier.telegram.command;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,9 @@
-package se.pbt.ddplus.notifier.telegram;
+package se.pbt.ddplus.notifier.telegram.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import se.pbt.ddplus.notifier.core.NotifierPort;
+import se.pbt.ddplus.notifier.telegram.client.TelegramApiClient;
 
 import java.util.List;
 import java.util.regex.Pattern;

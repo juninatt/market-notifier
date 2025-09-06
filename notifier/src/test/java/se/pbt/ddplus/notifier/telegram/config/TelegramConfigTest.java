@@ -1,4 +1,4 @@
-package se.pbt.ddplus.notifier.telegram;
+package se.pbt.ddplus.notifier.telegram.config;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.pbt.ddplus.notifier.telegram.TelegramConfig.escapeMarkdownV2;
+import static se.pbt.ddplus.notifier.telegram.config.TelegramConfig.escapeMarkdownV2;
 
 @DisplayName("TelegramConfig)")
 class TelegramConfigTest {
