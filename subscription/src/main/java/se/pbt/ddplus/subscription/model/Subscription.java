@@ -1,7 +1,8 @@
-package se.pbt.ddplus.subscription;
+package se.pbt.ddplus.subscription.model;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import java.util.TimeZone;
 
 /**
