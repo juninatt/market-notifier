@@ -1,4 +1,4 @@
-package se.pbt.ddplus.subscription;
+package se.pbt.ddplus.subscription.persistence;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

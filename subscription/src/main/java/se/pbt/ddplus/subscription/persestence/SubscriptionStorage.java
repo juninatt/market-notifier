@@ -27,6 +27,11 @@ public class SubscriptionStorage {
         return loadSubscriptions(DEFAULT_FILE);
     }
 
+    /**
+     * Loads subscriptions from a YAML file or classpath resource.
+     * <p>
+     * Returns an empty list if the file is missing or cannot be parsed.
+     */
     public List<Subscription> loadSubscriptions(String path) {
         try (InputStream input = tryLoadInputStream(path)) {
             if (input == null) {
@@ -43,6 +48,12 @@ public class SubscriptionStorage {
         }
     }
 
+    /**
+     * Attempts to open an {@link InputStream} for the given path.
+     * <p>
+     * First checks the file system; if no file is found, falls back to
+     * loading from the classpath resources.
+     */
     private InputStream tryLoadInputStream(String path) throws IOException {
         File file = new File(path);
         if (file.exists()) {
