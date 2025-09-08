@@ -14,6 +14,7 @@ import java.util.TimeZone;
 public class Subscription {
 
     private String id;
+    private long chatId;
     private String schedule;
     private TimeZone timezone;
     private SubscriptionFilter filter;
@@ -25,6 +26,7 @@ public class Subscription {
     public String toString() {
         return "Subscription{" +
                 "id='" + id + '\'' +
+                "chatId='" + chatId + '\'' +
                 ", schedule='" + schedule + '\'' +
                 ", timezone=" + timezone +
                 ", filter=" + filter +
