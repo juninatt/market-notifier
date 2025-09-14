@@ -2,6 +2,7 @@ package se.pbt.ddplus.subscription.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import se.pbt.ddplus.core.schedule.SchedulePreset;
 
 import java.util.TimeZone;
 
@@ -15,11 +16,10 @@ public class Subscription {
 
     private String id;
     private long chatId;
-    private String schedule;
+    private SchedulePreset schedule;
     private TimeZone timezone;
     private SubscriptionFilter filter;
     private int maxItems;
-    private int priority;
     private boolean enabled;
 
     @Override
@@ -27,11 +27,10 @@ public class Subscription {
         return "Subscription{" +
                 "id='" + id + '\'' +
                 "chatId='" + chatId + '\'' +
-                ", schedule='" + schedule + '\'' +
+                ", schedule=" + (schedule != null ? schedule.name() : null) +
                 ", timezone=" + timezone +
                 ", filter=" + filter +
                 ", maxItems=" + maxItems +
-                ", priority=" + priority +
                 ", enabled=" + enabled +
                 '}';
     }

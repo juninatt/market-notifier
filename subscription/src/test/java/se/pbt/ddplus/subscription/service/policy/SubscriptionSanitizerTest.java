@@ -1,6 +1,7 @@
 package se.pbt.ddplus.subscription.service.policy;
 
 import org.junit.jupiter.api.*;
+import se.pbt.ddplus.core.schedule.SchedulePreset;
 import se.pbt.ddplus.subscription.model.Subscription;
 import se.pbt.ddplus.subscription.model.SubscriptionFilter;
 
@@ -176,6 +177,45 @@ class SubscriptionSanitizerTest {
             List<String> result = sanitizer.normalizeKeywords(input);
             assertEquals(List.of("c#", "node.js"), result);
         }
+
+
+        @Nested
+        @DisplayName("usesSameSchedule:")
+        class UsesSameSchedule {
+
+            @Test
+            @DisplayName("Returns true when both subscriptions use the same schedule preset")
+            void returnsTrue_ForSameSchedule() {
+                Subscription s1 = newSubscriptionWithSchedule(List.of("AI"), "en", SchedulePreset.MORNING_EVENING);
+                Subscription s2 = newSubscriptionWithSchedule(List.of("AI"), "en", SchedulePreset.MORNING_EVENING);
+                assertTrue(sanitizer.usesSameSchedule(s1, s2));
+            }
+
+            @Test
+            @DisplayName("Returns false when schedules differ")
+            void returnsFalse_ForDifferentSchedules() {
+                Subscription s1 = newSubscriptionWithSchedule(List.of("AI"), "en", SchedulePreset.MORNING);
+                Subscription s2 = newSubscriptionWithSchedule(List.of("AI"), "en", SchedulePreset.EVENING);
+                assertFalse(sanitizer.usesSameSchedule(s1, s2));
+            }
+
+            @Test
+            @DisplayName("Returns false when one schedule is null")
+            void returnsFalse_WhenOneScheduleIsNull() {
+                Subscription s1 = newSubscriptionWithSchedule(List.of("AI"), "en", null);
+                Subscription s2 = newSubscriptionWithSchedule(List.of("AI"), "en", SchedulePreset.MORNING);
+                assertFalse(sanitizer.usesSameSchedule(s1, s2));
+            }
+
+            @Test
+            @DisplayName("Returns true when both schedules are null")
+            void returnsTrue_WhenBothSchedulesAreNull() {
+                Subscription s1 = newSubscriptionWithSchedule(List.of("AI"), "en", null);
+                Subscription s2 = newSubscriptionWithSchedule(List.of("AI"), "en", null);
+                assertTrue(sanitizer.usesSameSchedule(s1, s2));
+            }
+        }
+
     }
 
 
@@ -187,4 +227,11 @@ class SubscriptionSanitizerTest {
             sub.setFilter(f);
             return sub;
         }
+
+    private Subscription newSubscriptionWithSchedule(List<String> keywords, String language, SchedulePreset schedule) {
+        Subscription sub = newSubscription(keywords, language);
+        sub.setSchedule(schedule);
+        return sub;
+    }
+
 }
