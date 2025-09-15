@@ -87,8 +87,7 @@ public class TelegramCommandParser {
      */
     private SchedulePreset parseScheduleOrNull(String token) {
         if (token == null) return null;
-        SchedulePreset preset = SCHEDULE_ALIASES.get(token.toLowerCase(Locale.ROOT));
-        return preset;
+        return SCHEDULE_ALIASES.get(token.toLowerCase(Locale.ROOT));
     }
 
     /**

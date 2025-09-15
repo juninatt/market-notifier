@@ -1,4 +1,4 @@
-package se.pbt.ddplus.subscription.service.policy;
+package se.pbt.ddplus.subscription.policy;
 
 import org.springframework.stereotype.Component;
 import se.pbt.ddplus.subscription.model.Subscription;
@@ -26,7 +26,7 @@ public class SubscriptionSanitizer {
                 .filter(s -> !s.isEmpty())
                 .map(this::normalizeString)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
         return List.copyOf(out);
     }
 

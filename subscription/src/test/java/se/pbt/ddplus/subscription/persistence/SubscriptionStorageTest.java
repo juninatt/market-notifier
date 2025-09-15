@@ -2,9 +2,9 @@ package se.pbt.ddplus.subscription.persistence;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import se.pbt.ddplus.core.schedule.SchedulePreset;
 import se.pbt.ddplus.subscription.model.Subscription;
 import se.pbt.ddplus.subscription.model.SubscriptionFilter;
-import se.pbt.ddplus.subscription.persestence.SubscriptionStorage;
 
 import java.util.List;
 import java.util.TimeZone;
@@ -52,10 +52,9 @@ class SubscriptionStorageTest {
             Subscription aiAlerts = new Subscription();
             aiAlerts.setId("ai-alerts");
             aiAlerts.setChatId(123456789L);
-            aiAlerts.setSchedule("0 0 * * * *"); // Every hour
+            aiAlerts.setSchedule(SchedulePreset.MORNING);
             aiAlerts.setTimezone(TimeZone.getTimeZone("Europe/Stockholm"));
             aiAlerts.setMaxItems(5);
-            aiAlerts.setPriority(1);
             aiAlerts.setEnabled(true);
 
             SubscriptionFilter aiFilter = new SubscriptionFilter();
@@ -66,10 +65,9 @@ class SubscriptionStorageTest {
 
             Subscription greenNews = new Subscription();
             greenNews.setId("green-news");
-            greenNews.setSchedule("0 30 * * * *"); // Every hour at 30 minutes past
+            greenNews.setSchedule(SchedulePreset.MORNING_EVENING);
             greenNews.setTimezone(TimeZone.getTimeZone("Europe/Stockholm"));
             greenNews.setMaxItems(5);
-            greenNews.setPriority(2);
             greenNews.setEnabled(true);
 
             SubscriptionFilter greenFilter = new SubscriptionFilter();

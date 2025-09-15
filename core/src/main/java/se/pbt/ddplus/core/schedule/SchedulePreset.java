@@ -1,8 +1,11 @@
 package se.pbt.ddplus.core.schedule;
 
+import lombok.Getter;
+
 /**
  * Represents predefined schedule presets that are translated into cron expressions.
  */
+@Getter
 public enum SchedulePreset {
     MORNING("0 0 8 * * *"),
     EVENING("0 0 20 * * *"),
@@ -13,10 +16,6 @@ public enum SchedulePreset {
 
     SchedulePreset(String cron) {
         this.cron = cron;
-    }
-
-    public String getCron() {
-        return cron;
     }
 }
 

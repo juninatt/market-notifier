@@ -1,6 +1,9 @@
-package se.pbt.ddplus.subscription.service.policy;
+package se.pbt.ddplus.subscription.policy;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import se.pbt.ddplus.core.schedule.SchedulePreset;
 import se.pbt.ddplus.subscription.model.Subscription;
 import se.pbt.ddplus.subscription.model.SubscriptionFilter;
@@ -218,6 +221,7 @@ class SubscriptionSanitizerTest {
 
     }
 
+    // Helpers
 
     private Subscription newSubscription(List<String> keywords, String language) {
             Subscription sub = new Subscription();

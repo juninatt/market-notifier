@@ -1,7 +1,8 @@
-package se.pbt.ddplus.subscription.persestence;
+package se.pbt.ddplus.subscription.persistence;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.springframework.stereotype.Component;
 import se.pbt.ddplus.subscription.model.Subscription;
 import se.pbt.ddplus.subscription.model.SubscriptionListWrapper;
 
@@ -15,6 +16,7 @@ import java.util.List;
  * Handles loading and saving subscriptions to and from a YAML file.
  * Used as simple file-based storage for the user's subscriptions.
  */
+@Component
 public class SubscriptionStorage {
 
     // TODO: Move to a shared constants file if reused
