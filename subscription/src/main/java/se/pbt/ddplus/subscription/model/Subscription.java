@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import se.pbt.ddplus.core.schedule.SchedulePreset;
+import se.pbt.ddplus.core.subscription.SchedulePreset;
 
 import java.util.TimeZone;
 

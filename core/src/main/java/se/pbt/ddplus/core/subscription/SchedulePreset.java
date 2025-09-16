@@ -1,4 +1,4 @@
-package se.pbt.ddplus.core.schedule;
+package se.pbt.ddplus.core.subscription;
 
 import lombok.Getter;
 

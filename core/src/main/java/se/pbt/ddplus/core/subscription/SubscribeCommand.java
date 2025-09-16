@@ -1,7 +1,5 @@
 package se.pbt.ddplus.core.subscription;
 
-import se.pbt.ddplus.core.schedule.SchedulePreset;
-
 import java.util.List;
 
 /**

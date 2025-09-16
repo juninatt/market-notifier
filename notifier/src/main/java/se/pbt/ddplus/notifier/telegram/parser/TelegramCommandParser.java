@@ -1,6 +1,6 @@
 package se.pbt.ddplus.notifier.telegram.parser;
 
-import se.pbt.ddplus.core.schedule.SchedulePreset;
+import se.pbt.ddplus.core.subscription.SchedulePreset;
 import se.pbt.ddplus.core.subscription.SubscribeCommand;
 
 import java.util.ArrayList;

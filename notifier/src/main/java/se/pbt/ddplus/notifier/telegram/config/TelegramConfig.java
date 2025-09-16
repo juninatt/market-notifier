@@ -2,10 +2,8 @@ package se.pbt.ddplus.notifier.telegram.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import se.pbt.ddplus.notifier.core.NotifierPort;
 import se.pbt.ddplus.notifier.telegram.client.TelegramApiClient;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -42,19 +40,6 @@ public class TelegramConfig {
         return new TelegramApiClient(properties.getBaseUrl(), properties.getBotToken());
     }
 
-    /**
-     * Creates a {@link NotifierPort} that formats and sends notifications to configured chat IDs.
-     * Escapes for MarkdownV2 and performs a blocking send to expose delivery failures.
-     */
-    @Bean
-    NotifierPort telegramNotifier(List<Long> idList, TelegramApiClient api) {
-        return n -> {
-            String text = escapeMarkdownV2(n.title())
-                    + (n.body()!=null && !n.body().isBlank() ? "\n\n" + escapeMarkdownV2(n.body()) : "")
-                    + (n.url()!=null  && !n.url().isBlank()  ? "\n"   + escapeMarkdownV2(n.url())  : "");
-            for (long id : idList) {
-                api.sendMessage(id, text).block();
-            }
-        };
-    }
+
+
 }

@@ -3,7 +3,7 @@ package se.pbt.ddplus.notifier.telegram.parser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import se.pbt.ddplus.core.schedule.SchedulePreset;
+import se.pbt.ddplus.core.subscription.SchedulePreset;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package se.pbt.ddplus.notifier.core;
+package se.pbt.ddplus.notifier.model;
 
 /**
  * Represents a notification message used as the input model

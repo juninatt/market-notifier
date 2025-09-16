@@ -2,7 +2,7 @@ package se.pbt.ddplus.subscription.policy;
 
 import org.springframework.stereotype.Component;
 import se.pbt.ddplus.subscription.model.Subscription;
-import se.pbt.ddplus.core.schedule.SchedulePreset;
+import se.pbt.ddplus.core.subscription.SchedulePreset;
 
 import java.util.*;
 import java.util.stream.Collectors;

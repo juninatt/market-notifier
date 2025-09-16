@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import se.pbt.ddplus.core.schedule.SchedulePreset;
+import se.pbt.ddplus.core.subscription.SchedulePreset;
 import se.pbt.ddplus.core.subscription.SubscribeCommand;
 import se.pbt.ddplus.subscription.model.Subscription;
 import se.pbt.ddplus.subscription.model.SubscriptionFilter;
