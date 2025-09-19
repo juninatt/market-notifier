@@ -1,7 +1,9 @@
 package se.pbt.ddplus.notifier.telegram.parser;
 
+import org.springframework.stereotype.Component;
 import se.pbt.ddplus.core.subscription.SchedulePreset;
 import se.pbt.ddplus.core.subscription.SubscribeCommand;
+import se.pbt.ddplus.notifier.telegram.model.TelegramCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.regex.Pattern;
  * Parses incoming Telegram commands into structured DTOs.
  * Does not perform business logic or external validation.
  */
+@Component
 public class TelegramCommandParser {
 
     // Matches either quoted strings or single non-whitespace tokens
@@ -37,8 +40,8 @@ public class TelegramCommandParser {
      * Where [schedule] is optional and can be one of:
      *   morning|m, evening|e, morning_evening|me, morning_lunch_evening|mle
      */
-    public SubscribeCommand parseSubscribeCommand(long chatId, String message) {
-        List<String> tokens = extractTokens(message.strip());
+    public SubscribeCommand parseSubscribeCommand(TelegramCommand command) {
+        List<String> tokens = extractTokens(command.message().strip());
         validateCommandFormat(tokens);
 
         int maxItems = extractAndValidateMaxItems(tokens.get(tokens.size() - 1));
@@ -57,7 +60,7 @@ public class TelegramCommandParser {
             keywords = extractKeywords(tokens,tokens.size() - 2);
         }
 
-        return new SubscribeCommand(chatId, language, maxItems, keywords, schedule);
+        return new SubscribeCommand(command.chatId(), language, maxItems, keywords, schedule);
     }
 
     /**

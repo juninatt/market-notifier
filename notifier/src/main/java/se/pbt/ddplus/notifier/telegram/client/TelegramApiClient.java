@@ -38,7 +38,12 @@ public final class TelegramApiClient {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(payload)
                 .retrieve()
-                .bodyToMono(String.class)
+                .onStatus(HttpStatusCode::isError, resp ->
+                        resp.bodyToMono(String.class).defaultIfEmpty("")
+                                .flatMap(body -> Mono.error(new RuntimeException(
+                                        "Telegram " + resp.statusCode().value() + " -> " + body)))
+                )
+                .toBodilessEntity()
                 .then();
     }
 
