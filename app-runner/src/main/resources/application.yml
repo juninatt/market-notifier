@@ -2,22 +2,10 @@ server:
   port: 8081
 
 spring:
+  config:
+    import:
+      - optional:application-telegram.yml
+      - optional:application-finnhub.yml
+      - optional:application-marketaux.yml
   main:
     web-application-type: none
-
-finnhub:
-  api:
-    base-url: https://finnhub.io/api/v1
-    token: ${FINNHUB_API_KEY}
-
-marketaux:
-  api:
-    base-url: https://api.marketaux.com/v1
-    token: ${MARKETAUX_API_KEY}
-
-telegram:
-  baseUrl: "https://api.telegram.org"
-  botToken: ${TELEGRAM_BOT_TOKEN}
-  chatIds: ${TELEGRAM_CHAT_IDS}
-  longPollTimeoutSeconds: 50
-  initialOffset: 0

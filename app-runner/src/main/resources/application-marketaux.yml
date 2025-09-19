@@ -1,0 +1,4 @@
+marketaux:
+  api:
+    base-url: https://api.marketaux.com/v1
+    token: ${MARKETAUX_API_KEY}

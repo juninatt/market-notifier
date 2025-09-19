@@ -1,0 +1,61 @@
+telegram:
+  bot:
+    enabled: true
+    baseUrl: "https://api.telegram.org"
+    botToken: ${TELEGRAM_BOT_TOKEN}
+    chatIds: ${TELEGRAM_CHAT_IDS}
+    longPollTimeoutSeconds: 50
+    initialOffset: 0
+
+  messages:
+    help: |-
+      👋 Welcome! Here’s how to use DD+:
+
+      Create a subscription:
+        /subscribe "<keywords>" <language> [schedule] <maxItems>
+
+      Examples:
+        /subscribe "Tesla" en 10
+        /subscribe "AI stocks" en me 15
+        /subscribe "Volvo" sv evening 5
+
+      Parameters:
+        <keywords>  – one or more words; quote if spaces are needed
+        <language>  – two letters, e.g., en, sv
+        [schedule]  – (optional) morning|evening|morning_evening|morning_lunch_evening
+                       aliases: m|e|me|mle
+        <maxItems>  – maximum number of news items (1–20)
+
+      Tip: use /help to see this again.
+
+    unknownCommand: "❓ Sorry, I didn’t understand that. Type /help for instructions."
+
+    subscription:
+      confirm: |-
+        You want to subscribe with:
+        Keywords: {0}
+        Language: {1}
+        Schedule: {2}
+        Max items: {3}
+        Are you happy with this?
+
+      saved: "✅ Your subscription has been saved."
+      cancelled: "❌ Subscription cancelled. You can try again with /subscribe."
+      invalidFormat: "⚠️ Invalid format. Please use: /subscribe \"<keywords>\" <language> [schedule] <maxItems>"
+
+    management:
+      list: |-
+        Here are your current subscriptions:
+        {0}
+      none: "ℹ️ You don’t have any subscriptions yet. Use /subscribe to create one."
+      removed: "✅ Subscription removed."
+      notFound: "⚠️ Could not find a subscription with that ID or keyword."
+
+    error:
+      unexpected: "⚠️ Oops, something went wrong. Please try again later."
+      unavailable: "⚠️ News provider is temporarily unavailable. Please try again later."
+
+    buttons:
+      confirm: "Yes ✅"
+      cancel: "No ❌"
+      back: "🔙 Back"
