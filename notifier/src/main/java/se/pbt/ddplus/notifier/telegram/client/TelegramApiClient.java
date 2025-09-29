@@ -1,5 +1,7 @@
 package se.pbt.ddplus.notifier.telegram.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -11,6 +13,7 @@ public final class TelegramApiClient {
 
     // TODO: Move to Constants
     private static final String SEND_MESSAGE_PATH = "/sendMessage";
+    private static final String GET_UPDATES_PATH  = "/getUpdates";
     private static final String PARSE_MODE = "MarkdownV2";
 
     private final WebClient client;
@@ -45,6 +48,28 @@ public final class TelegramApiClient {
                 )
                 .toBodilessEntity()
                 .then();
+    }
+
+    /**
+     * Fetches updates using long polling.
+     *
+     * @param timeoutSeconds long-poll timeout in seconds
+     * @param offset the next update_id to fetch; Telegram returns >= this value
+     */
+    public Mono<JsonNode> getUpdates(int timeoutSeconds, long offset) {
+        return client.get()
+                .uri(uri -> uri
+                        .path(GET_UPDATES_PATH)
+                        .queryParam("timeout", Math.max(1, timeoutSeconds))
+                        .queryParam("offset", offset)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, resp ->
+                        resp.bodyToMono(String.class).defaultIfEmpty("")
+                                .flatMap(body -> Mono.error(new RuntimeException(
+                                        "getUpdates " + resp.statusCode().value() + " -> " + body))))
+                .bodyToMono(JsonNode.class);
     }
 
     /**

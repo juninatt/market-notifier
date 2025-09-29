@@ -13,11 +13,13 @@ import java.util.List;
 @Setter
 @Getter
 @Configuration
-@ConfigurationProperties(prefix = "telegram")
+@ConfigurationProperties(prefix = "telegram.bot")
 public class TelegramProperties {
     private boolean enabled = true;
     private String botToken;
     private List<Long> chatIds = List.of();
     private String baseUrl;
+    private int initialOffset;
+    private int longPollTimeoutSeconds;
 }
 
