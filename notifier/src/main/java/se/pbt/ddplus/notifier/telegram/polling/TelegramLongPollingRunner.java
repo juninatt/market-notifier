@@ -7,7 +7,7 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import se.pbt.ddplus.notifier.telegram.client.TelegramApiClient;
-import se.pbt.ddplus.notifier.telegram.config.TelegramProperties;
+import se.pbt.ddplus.notifier.telegram.config.TelegramBotProperties;
 import se.pbt.ddplus.notifier.telegram.model.TelegramCommand;
 import se.pbt.ddplus.notifier.telegram.service.TelegramService;
 
@@ -25,7 +25,7 @@ public class TelegramLongPollingRunner implements SmartLifecycle {
 
     private static final Logger log = LoggerFactory.getLogger(TelegramLongPollingRunner.class);
 
-    private final TelegramProperties props;
+    private final TelegramBotProperties botProperties;
     private final TelegramService telegramService;
     private final TelegramApiClient apiClient;
 
@@ -44,14 +44,14 @@ public class TelegramLongPollingRunner implements SmartLifecycle {
      * Initializes the polling offset so restarts continue from a known point.
      */
     public TelegramLongPollingRunner(
-            TelegramProperties props,
+            TelegramBotProperties botProperties,
             TelegramService telegramService,
             TelegramApiClient apiClient
     ) {
-        this.props = props;
+        this.botProperties = botProperties;
         this.telegramService = telegramService;
         this.apiClient = apiClient;
-        this.offset = props.getInitialOffset();
+        this.offset = botProperties.getInitialOffset();
     }
 
     // SmartLifecycle
@@ -124,7 +124,7 @@ public class TelegramLongPollingRunner implements SmartLifecycle {
      * short delays to avoid tight loops and tolerate transient failures.
      */
     private void pollLoop() {
-        final int timeout = Math.max(1, props.getLongPollTimeoutSeconds());
+        final int timeout = Math.max(1, botProperties.getLongPollTimeoutSeconds());
 
         while (running) {
             try {
@@ -144,9 +144,9 @@ public class TelegramLongPollingRunner implements SmartLifecycle {
                     continue;
                 }
 
-                for (JsonNode upd : result) {
-                    advanceOffset(upd);
-                    toCommand(upd).ifPresent(telegramService::handleTelegramCommand);
+                for (JsonNode update : result) {
+                    advanceOffset(update);
+                    toCommand(update).ifPresent(telegramService::handleTelegramCommand);
                 }
                 sleep(SLEEP_SHORT_MS);
             } catch (Exception e) {
@@ -162,11 +162,11 @@ public class TelegramLongPollingRunner implements SmartLifecycle {
      * Validates startup conditions and logs if startup is skipped.
      */
     private boolean shouldStart() {
-        if (!props.isEnabled()) {
+        if (!botProperties.isEnabled()) {
             log.info("Telegram long-poll: disabled by config.");
             return false;
         }
-        if (props.getBotToken() == null || props.getBotToken().isBlank()) {
+        if (botProperties.getBotToken() == null || botProperties.getBotToken().isBlank()) {
             log.error("Telegram long-poll: missing botToken");
             return false;
         }
@@ -184,11 +184,11 @@ public class TelegramLongPollingRunner implements SmartLifecycle {
     /**
      * Waits for a thread to finish, restoring interrupt state if interrupted.
      */
-    private void joinQuietly(Thread t, long ms) {
-        if (t == null || !t.isAlive())
+    private void joinQuietly(Thread thread, long ms) {
+        if (thread == null || !thread.isAlive())
             return;
         try {
-            t.join(ms);
+            thread.join(ms);
         } catch (InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
@@ -226,8 +226,8 @@ public class TelegramLongPollingRunner implements SmartLifecycle {
     /**
      * Extracts a text message into a {@link TelegramCommand}.
      */
-    private Optional<TelegramCommand> toCommand(JsonNode upd) {
-        JsonNode message = upd.path("message");
+    private Optional<TelegramCommand> toCommand(JsonNode update) {
+        JsonNode message = update.path("message");
         if (message.isMissingNode())
             return Optional.empty();
 

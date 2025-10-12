@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Configuration
 @ConfigurationProperties(prefix = "telegram.bot")
-public class TelegramProperties {
+public class TelegramBotProperties {
     private boolean enabled = true;
     private String botToken;
     private List<Long> chatIds = List.of();

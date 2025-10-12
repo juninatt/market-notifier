@@ -11,7 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.Answer;
 import reactor.core.publisher.Mono;
 import se.pbt.ddplus.notifier.telegram.client.TelegramApiClient;
-import se.pbt.ddplus.notifier.telegram.config.TelegramProperties;
+import se.pbt.ddplus.notifier.telegram.config.TelegramBotProperties;
 import se.pbt.ddplus.notifier.telegram.model.TelegramCommand;
 import se.pbt.ddplus.notifier.telegram.service.TelegramService;
 
@@ -31,7 +31,7 @@ class TelegramLongPollingRunnerTest {
     private static final long AWAIT_SHORT_MS = 1000;
     private static final long AWAIT_RECOVERY_MS = 2500;
 
-    private TelegramProperties props;
+    private TelegramBotProperties props;
     private TelegramService telegramService;
     private TelegramApiClient apiClient;
     private TelegramLongPollingRunner runner;
@@ -40,7 +40,7 @@ class TelegramLongPollingRunnerTest {
 
     @BeforeEach
     void setup() {
-        props = new TelegramProperties();
+        props = new TelegramBotProperties();
         props.setEnabled(true);
         props.setBotToken(BOT_TOKEN);
         props.setBaseUrl(TELEGRAM_BASE_URL);

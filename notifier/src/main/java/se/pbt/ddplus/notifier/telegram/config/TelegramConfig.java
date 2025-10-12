@@ -18,7 +18,7 @@ public class TelegramConfig {
      * Regex pattern matching all Telegram MarkdownV2 special characters.
      * */
     private static final Pattern MDV2_SPECIALS = Pattern.compile(
-            "([_\\*\\[\\]\\(\\)~`>#+\\-=|\\{\\}\\.\\!\\\\])"
+            "([_*\\[\\]()~`>#+\\-=|{}.!\\\\])"
     );
 
     /**
@@ -33,10 +33,10 @@ public class TelegramConfig {
 
 
     /**
-     * Creates a configured Telegram API client using properties from {@link TelegramProperties}.
+     * Creates a configured Telegram API client using properties from {@link TelegramBotProperties}.
      */
     @Bean
-    TelegramApiClient telegramApiClient(TelegramProperties properties) {
+    TelegramApiClient telegramApiClient(TelegramBotProperties properties) {
         return new TelegramApiClient(properties.getBaseUrl(), properties.getBotToken());
     }
 

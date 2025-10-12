@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @ConfigurationProperties(prefix = "telegram.messages")
-public class TelegramMessagesProperties {
+public class TelegramMsgProperties {
 
     /** General help/start text shown when the user types /start or /help. */
     private String help;
