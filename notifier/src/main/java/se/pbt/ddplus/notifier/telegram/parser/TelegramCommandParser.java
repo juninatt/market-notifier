@@ -2,7 +2,7 @@ package se.pbt.ddplus.notifier.telegram.parser;
 
 import org.springframework.stereotype.Component;
 import se.pbt.ddplus.core.subscription.SchedulePreset;
-import se.pbt.ddplus.core.subscription.SubscribeCommand;
+import se.pbt.ddplus.core.subscription.TelegramSubscribeCommand;
 import se.pbt.ddplus.notifier.telegram.model.TelegramCommand;
 
 import java.util.ArrayList;
@@ -34,13 +34,13 @@ public class TelegramCommandParser {
     );
 
     /**
-     * Parses a /subscribe command into a {@link SubscribeCommand}.
+     * Parses a /subscribe command into a {@link TelegramSubscribeCommand}.
      * Format:
      *   /subscribe <keywords...> <language> [schedule] <maxItems>
      * Where [schedule] is optional and can be one of:
      *   morning|m, evening|e, morning_evening|me, morning_lunch_evening|mle
      */
-    public SubscribeCommand parseSubscribeCommand(TelegramCommand command) {
+    public TelegramSubscribeCommand parseSubscribeCommand(TelegramCommand command) {
         List<String> tokens = extractTokens(command.message().strip());
         validateCommandFormat(tokens);
 
@@ -60,7 +60,7 @@ public class TelegramCommandParser {
             keywords = extractKeywords(tokens,tokens.size() - 2);
         }
 
-        return new SubscribeCommand(command.chatId(), language, maxItems, keywords, schedule);
+        return new TelegramSubscribeCommand(command.chatId(), language, maxItems, keywords, schedule);
     }
 
     /**
