@@ -21,12 +21,6 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- Spring -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-
         <!-- For manual YAML parsing with Jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
