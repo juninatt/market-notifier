@@ -3,6 +3,7 @@ package se.pbt.ddplus.notifier.telegram.mapper;
 import org.springframework.stereotype.Component;
 import se.pbt.ddplus.core.subscription.SchedulePreset;
 import se.pbt.ddplus.core.subscription.TelegramSubscribeCommand;
+import se.pbt.ddplus.subscription.contract.SubscriptionMapper;
 import se.pbt.ddplus.subscription.model.Subscription;
 import se.pbt.ddplus.subscription.model.SubscriptionFilter;
 
@@ -11,10 +12,13 @@ import java.util.Objects;
 import java.util.TimeZone;
 
 /**
- * Converts a {@link TelegramSubscribeCommand} into a {@link Subscription} domain object.
+ * Maps {@link TelegramSubscribeCommand} objects into {@link Subscription} domain entities.
+ * <p>
+ * Implements the {@link SubscriptionMapper} contract to translate Telegram-specific
+ * subscription requests into a standardized domain model used by the system.
  */
 @Component
-public class TelegramSubscriptionMapper {
+public class TelegramSubscriptionMapper implements SubscriptionMapper<TelegramSubscribeCommand> {
 
     private static final TimeZone DEFAULT_TZ = TimeZone.getTimeZone("Europe/Stockholm");
 
@@ -48,6 +52,11 @@ public class TelegramSubscriptionMapper {
         return sub;
     }
 
+    /**
+     * Trims and validates a language code.
+     * <p>
+     * Returns {@code null} if the input is empty or only whitespace.
+     */
     private String normalizeLanguage(String language) {
         if (language == null) return null;
         String trimmed = language.trim();
