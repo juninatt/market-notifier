@@ -1,4 +1,4 @@
-package se.pbt.ddplus.notifier.telegram.parser;
+package se.pbt.ddplus.notifier.telegram.format;
 
 import org.springframework.stereotype.Component;
 import se.pbt.ddplus.core.subscription.SchedulePreset;
@@ -13,11 +13,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Parses incoming Telegram commands into structured DTOs.
- * Does not perform business logic or external validation.
+ * Responsible for interpreting raw Telegram input and converting it into structured command objects.
+ * <p>
+ * The parser provides a standardized way to translate user messages into a format
+ * that can be handled consistently by the application’s command logic.
+ * It focuses solely on syntactic interpretation and normalization, not business validation.
  */
 @Component
-public class TelegramCommandParser {
+public class TelegramInputParser {
 
     // Matches either quoted strings or single non-whitespace tokens
     private static final Pattern TOKEN_PATTERN = Pattern.compile("\"([^\"]+)\"|(\\S+)");
@@ -64,7 +67,10 @@ public class TelegramCommandParser {
     }
 
     /**
-     * Extracts quoted or unquoted tokens from input.
+     * Splits the incoming Telegram message into tokens.
+     * <p>
+     * Supports both quoted and unquoted segments, allowing
+     * multi-word keyword phrases such as {@code "AI stocks"}.
      */
     private List<String> extractTokens(String input) {
         List<String> tokens = new ArrayList<>();
@@ -76,7 +82,8 @@ public class TelegramCommandParser {
     }
 
     /**
-     * Validates minimal format and leading command token.
+     * Ensures that the parsed token sequence starts with {@code /subscribe}
+     * and contains at least the required arguments.
      */
     private void validateCommandFormat(List<String> tokens) {
         if (tokens.size() < 4 || !tokens.get(0).equalsIgnoreCase("/subscribe")) {
@@ -116,7 +123,10 @@ public class TelegramCommandParser {
     }
 
     /**
-     * Extracts all keyword tokens from the command input.
+     * Collects all tokens representing subscription keywords.
+     * <p>
+     * Everything between the command itself and the language/schedule tokens
+     * is considered part of the keyword list.
      */
     private List<String> extractKeywords(List<String> tokens, int toIndexExclusive) {
         if (toIndexExclusive <= 1) {

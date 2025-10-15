@@ -1,5 +1,7 @@
 package se.pbt.ddplus.notifier.telegram.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
@@ -16,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TelegramApiClientTest {
 
     private MockWebServer server;
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() throws IOException {
@@ -30,7 +33,7 @@ class TelegramApiClientTest {
 
     @Test
     @DisplayName("POSTs correct JSON to /bot{token}/sendMessage and completes")
-    void sendMessage_postsJsonToSendMessage_andCompletes() throws InterruptedException {
+    void sendMessage_postsJsonToSendMessage_andCompletes() throws Exception {
         // given
         server.enqueue(new MockResponse().setResponseCode(200).setBody("{\"ok\":true}"));
         String baseUrl = server.url("/").toString(); // ends with '/'
@@ -47,10 +50,11 @@ class TelegramApiClientTest {
         assertThat(recorded.getPath()).isEqualTo("/bot" + token + "/sendMessage");
         assertThat(recorded.getHeader("Content-Type")).contains("application/json");
 
-        String body = recorded.getBody().readUtf8();
-        assertThat(body).contains("\"chat_id\":123");
-        assertThat(body).contains("\"text\":\"hello\"");
-        assertThat(body).contains("\"parse_mode\":\"MarkdownV2\"");
+        // verify JSON structure semantically
+        JsonNode json = mapper.readTree(recorded.getBody().readUtf8());
+        assertThat(json.get("chat_id").asLong()).isEqualTo(123L);
+        assertThat(json.get("text").asText()).isEqualTo("hello");
+        assertThat(json.get("parse_mode").asText()).isEqualTo("MarkdownV2");
     }
 
     @Test
@@ -67,8 +71,8 @@ class TelegramApiClientTest {
     }
 
     @Test
-    @DisplayName("Works when baseUrl lacks a trailing slash")
-    void sendMessage_handlesBaseUrlWithoutTrailingSlash_andCompletes() throws InterruptedException {
+    @DisplayName("Handles baseUrl without trailing slash correctly")
+    void sendMessage_handlesBaseUrlWithoutTrailingSlash_andCompletes() throws Exception {
         // given
         server.enqueue(new MockResponse().setResponseCode(200).setBody("{\"ok\":true}"));
         String baseUrlWithSlash = server.url("/").toString();
@@ -86,7 +90,7 @@ class TelegramApiClientTest {
 
     @Test
     @DisplayName("Properly escapes quotes and backslashes in JSON body")
-    void sendMessage_jsonEscapesQuotesAndBackslash() throws InterruptedException {
+    void sendMessage_jsonEscapesQuotesAndBackslash() throws Exception {
         // given
         server.enqueue(new MockResponse().setResponseCode(200).setBody("{\"ok\":true}"));
         TelegramApiClient client = new TelegramApiClient(server.url("/").toString(), "T");
@@ -97,15 +101,18 @@ class TelegramApiClientTest {
 
         // then
         var recorded = server.takeRequest();
-        String body = recorded.getBody().readUtf8();
-        assertThat(body).contains("\"text\":\"a \\\"quote\\\" and a backslash \\\\\"");
-    }
+        JsonNode json = mapper.readTree(recorded.getBody().readUtf8());
 
+        assertThat(json.get("chat_id").asLong()).isEqualTo(7L);
+        String expected = "a \"quote\" and a backslash \\";
+        assertThat(json.get("text").asText()).isEqualTo(expected);
+        assertThat(json.get("parse_mode").asText()).isEqualTo("MarkdownV2");
+    }
 
     @ParameterizedTest(name = "Preserves Unicode sample → {0}")
     @MethodSource("unicodeSamples")
-    @DisplayName("Preserves Unicode/emoji (UTF-8) across scripts and sequences")
-    void sendMessage_preservesVariousUnicodeSamples(String sample) throws InterruptedException {
+    @DisplayName("Preserves Unicode and emoji correctly (UTF-8 safe)")
+    void sendMessage_preservesVariousUnicodeSamples(String sample) throws Exception {
         // given
         server.enqueue(new MockResponse().setResponseCode(200).setBody("{\"ok\":true}"));
         TelegramApiClient client = new TelegramApiClient(server.url("/").toString(), "T");
@@ -115,8 +122,8 @@ class TelegramApiClientTest {
 
         // then
         var recorded = server.takeRequest();
-        String body = recorded.getBody().readUtf8();
-        assertThat(body).contains(sample);
+        JsonNode json = mapper.readTree(recorded.getBody().readUtf8());
+        assertThat(json.get("text").asText()).isEqualTo(sample);
     }
 
     static Stream<String> unicodeSamples() {

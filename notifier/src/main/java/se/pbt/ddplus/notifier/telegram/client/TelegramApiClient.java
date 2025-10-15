@@ -6,8 +6,14 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import se.pbt.ddplus.notifier.telegram.format.TelegramOutputFormatter;
+
 /**
- * Simple client for sending messages via the Telegram Bot API.
+ * Lightweight client for interacting with the Telegram Bot API.
+ * <p>
+ * Handles sending messages and retrieving updates using {@link WebClient}.
+ * All outgoing text is automatically escaped for Telegram's MarkdownV2 syntax
+ * via {@link TelegramOutputFormatter}.
  */
 public final class TelegramApiClient {
 
@@ -30,10 +36,12 @@ public final class TelegramApiClient {
 
     /**
      * Builds a JSON payload and sends it to Telegram's {@code /sendMessage} endpoint.
+     * Text is escaped to ensure valid MarkdownV2 formatting.
      */
     public Mono<Void> sendMessage(long chatId, String text) {
+        String safeText = TelegramOutputFormatter.escapeMarkdown(text);
         String payload = "{\"chat_id\":" + chatId
-                + ",\"text\":" + json(text)
+                + ",\"text\":" + TelegramOutputFormatter.json(safeText)
                 + ",\"parse_mode\":\"" + PARSE_MODE + "\"}";
 
         return client.post()
@@ -43,18 +51,17 @@ public final class TelegramApiClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, resp ->
                         resp.bodyToMono(String.class).defaultIfEmpty("")
-                                .flatMap(body -> Mono.error(new RuntimeException(
-                                        "Telegram " + resp.statusCode().value() + " -> " + body)))
+                                .flatMap(body -> apiError("sendMessage", resp.statusCode(), body))
                 )
                 .toBodilessEntity()
                 .then();
     }
 
     /**
-     * Fetches updates using long polling.
-     *
-     * @param timeoutSeconds long-poll timeout in seconds
-     * @param offset the next update_id to fetch; Telegram returns >= this value
+     * Retrieves incoming updates from Telegram using long polling.
+     * <p>
+     * This method is used by a background worker to continuously
+     * fetch user commands or messages sent to the bot by the user.
      */
     public Mono<JsonNode> getUpdates(int timeoutSeconds, long offset) {
         return client.get()
@@ -67,19 +74,20 @@ public final class TelegramApiClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, resp ->
                         resp.bodyToMono(String.class).defaultIfEmpty("")
-                                .flatMap(body -> Mono.error(new RuntimeException(
-                                        "getUpdates " + resp.statusCode().value() + " -> " + body))))
+                                .flatMap(body -> apiError("getUpdates", resp.statusCode(), body))
+                )
                 .bodyToMono(JsonNode.class);
     }
 
     /**
-     * Converts a String so all special characters are
-     * represented in a JSON-safe way then wraps in quotes.
+     * Creates a standardized {@link RuntimeException} wrapped in a {@link Mono}.
+     * <p>
+     * Used for consistent error handling when the Telegram API responds
+     * with a non-successful HTTP status.
      */
-    private static String json(String text) {
-        return "\"" + text
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                + "\"";
+    private static <T> Mono<T> apiError(String action, HttpStatusCode status, String body) {
+        return Mono.error(new RuntimeException(
+                "Telegram API " + action + " failed: status=" + status.value() + ", body=" + body
+        ));
     }
 }

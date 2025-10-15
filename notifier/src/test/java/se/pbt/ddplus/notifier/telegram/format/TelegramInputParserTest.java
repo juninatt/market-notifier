@@ -1,4 +1,4 @@
-package se.pbt.ddplus.notifier.telegram.parser;
+package se.pbt.ddplus.notifier.telegram.format;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,9 +11,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("TelegramCommandParser")
-class TelegramCommandParserTest {
+class TelegramInputParserTest {
 
-    private final TelegramCommandParser parser = new TelegramCommandParser();
+    private final TelegramInputParser parser = new TelegramInputParser();
 
     @Nested
     @DisplayName("Command structure:")
