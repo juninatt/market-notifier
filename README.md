@@ -1,6 +1,6 @@
-# DD+ (Due Diligence Plus) (In Development)
+# Market Notifier (In Development)
 
-**DD+** is a personal Java project built with Maven and Spring Boot.  
+**Market Notifier** is a personal Java project built with Maven and Spring Boot.  
 It provides a modular, scheduled news subscription service with multiple sources (e.g., [Finnhub](https://finnhub.io/), [Marketaux](https://www.marketaux.com/))
 and **delivers notifications via Telegram** using the [Telegram Bot API](https://core.telegram.org/bots/api)
 
@@ -9,18 +9,18 @@ The project focuses on:
 - 🔐 Privacy: no personal data is stored
 - 🧩 Extensibility: easy to add new modules for providers or notifiers
 
-###  News providers: 
+**Requirements:** Java 17+, Maven, Telegram, Finnhub & MarketAux accounts.
 
-- **Finnhub**
-  Finnhub is a financial data API that offers a wide range of information, including general business news.
+###  News providers:
+- **Finnhub**  
+Financial data API that offers a wide range of information, including general business news.
 
-  - **Marketaux**
-  Marketaux is a financial news API focused on delivering headline articles filtered by criteria like company, region, or language.
+- **Marketaux**  
+Financial news API focused on delivering headline articles filtered by criteria like company, region, or language.
 
 ### Notifiers
-
 - **Telegram**  
-  Telegram is a cloud-based chat platform with private chats, large groups, and one-way broadcast channels.
+Cloud-based chat platform with private chats, large groups, and one-way broadcast channels.
 
 ---
 
@@ -46,9 +46,9 @@ Before running the app you need valid API tokens for **Finnhub**, **Marketaux**,
 
 **Find your chat ID(s)**
 - Quick way: call `getUpdates` and read the `chat.id` from the response.
-  ```bash
+```bash
   curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates"
-  ```
+```
 
 ### 2) Configure application.yml
 

@@ -9,7 +9,3 @@ spring:
       - optional:application-marketaux.yml
   main:
     web-application-type: none
-
-storage:
-  subscriptions:
-    telegram: "subscriptions/telegram-subscriptions.yml"

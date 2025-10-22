@@ -12,7 +12,7 @@ telegram:
 
   messages:
     help: |-
-      👋 Welcome! Here’s how to use DD+:
+      👋 Welcome! Here’s how to use Market Notifier:
 
       Create a subscription:
         /subscribe "<keywords>" <language> [schedule] <maxItems>
