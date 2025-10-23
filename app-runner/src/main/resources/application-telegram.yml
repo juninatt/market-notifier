@@ -7,9 +7,12 @@ telegram:
     longPollTimeoutSeconds: 50
     initialOffset: 0
 
+  storage:
+    subscriptions: "subscriptions/telegram-subscriptions.yml"
+
   messages:
     help: |-
-      👋 Welcome! Here’s how to use DD+:
+      👋 Welcome! Here’s how to use Market Notifier:
 
       Create a subscription:
         /subscribe "<keywords>" <language> [schedule] <maxItems>
