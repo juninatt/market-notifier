@@ -3,9 +3,7 @@ package se.pbt.marketnotifier.subscription.policy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import se.pbt.marketnotifier.core.subscription.SchedulePreset;
-import se.pbt.marketnotifier.subscription.model.Subscription;
-import se.pbt.marketnotifier.subscription.model.SubscriptionFilter;
+import se.pbt.marketnotifier.subscription.testutil.SubscriptionTestFactory;
 
 import java.util.List;
 
@@ -18,242 +16,326 @@ class SubscriptionIdGeneratorTest {
     private final SubscriptionIdGenerator generator = new SubscriptionIdGenerator();
 
     @Nested
-    @DisplayName("Id generation:")
+    @DisplayName("ID generation")
     class IdGeneration {
 
         @Test
         @DisplayName("Generates base id from chatId and first keyword")
-        void generatesBaseIdFromChatAndFirstKeyword() {
-            Subscription sub = makeSub(123L, List.of("AI"));
-            String id = generator.generateUniqueId(sub, List.of());
+        void generates_baseId_fromChatAndFirstKeyword() {
+            var filter = SubscriptionTestFactory.filter(List.of("AI"), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
+            var id = generator.generateUniqueId(sub, List.of());
             assertEquals("sub-123-ai", id);
         }
 
         @Test
-        @DisplayName("Appends -2 on for same subscription within the same chat")
-        void appendsSuffixOnCollision() {
-            Subscription existing = new Subscription();
-            existing.setId("sub-123-ai");
+        @DisplayName("Appends -2 for duplicate subscription in same chat")
+            // overlaps with increments_suffixBeyondSecond(), kept for completeness
+        void appends_suffix_onCollision() {
+            var existing = SubscriptionTestFactory.subscription("sub-123-ai");
             existing.setChatId(123L);
 
-            Subscription sub = makeSub(123L, List.of("AI"));
-            String id = generator.generateUniqueId(sub, List.of(existing));
+            var filter = SubscriptionTestFactory.filter(List.of("AI"), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
+            var id = generator.generateUniqueId(sub, List.of(existing));
             assertEquals("sub-123-ai-2", id);
         }
 
         @Test
-        @DisplayName("Increments suffix to the next free value")
-        void incrementsSuffixBeyondSecond() {
-            Subscription e1 = withIdAndChat("sub-123-ai", 123L);
-            Subscription e2 = withIdAndChat("sub-123-ai-2", 123L);
+        @DisplayName("Increments suffix when -2 already exists")
+        void increments_suffixBeyondSecond() {
+            var e1 = SubscriptionTestFactory.subscription("sub-123-ai");
+            var e2 = SubscriptionTestFactory.subscription("sub-123-ai-2");
+            e1.setChatId(123L);
+            e2.setChatId(123L);
 
-            Subscription sub = makeSub(123L, List.of("AI"));
-            String id = generator.generateUniqueId(sub, List.of(e1, e2));
+            var filter = SubscriptionTestFactory.filter(List.of("AI"), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
+            var id = generator.generateUniqueId(sub, List.of(e1, e2));
             assertEquals("sub-123-ai-3", id);
         }
 
         @Test
-        @DisplayName("Produces the same ID for identical input when no collisions exist")
-        void producesDeterministicBaseId() {
-            Subscription sub1 = makeSub(123L, List.of("AI"));
-            Subscription sub2 = makeSub(123L, List.of("AI"));
-            String id1 = generator.generateUniqueId(sub1, List.of());
-            String id2 = generator.generateUniqueId(sub2, List.of());
+        @DisplayName("Produces same ID for identical input when no collisions exist")
+            // overlaps with generates_baseId_fromChatAndFirstKeyword(), kept for completeness
+        void produces_deterministic_baseId() {
+            var filter = SubscriptionTestFactory.filter(List.of("AI"), List.of(), "en");
+            var sub1 = SubscriptionTestFactory.subscription(null, filter, true);
+            var sub2 = SubscriptionTestFactory.subscription(null, filter, true);
+            sub1.setChatId(123L);
+            sub2.setChatId(123L);
+
+            var id1 = generator.generateUniqueId(sub1, List.of());
+            var id2 = generator.generateUniqueId(sub2, List.of());
+
             assertEquals("sub-123-ai", id1);
             assertEquals(id1, id2);
         }
 
         @Test
-        @DisplayName("Picks the first free numeric suffix when there is a gap")
-        void picksFirstFreeSuffixWhenGapExists() {
-            Subscription e1 = withIdAndChat("sub-123-ai", 123L);
-            Subscription e3 = withIdAndChat("sub-123-ai-3", 123L);
-            Subscription sub = makeSub(123L, List.of("AI"));
-            String id = generator.generateUniqueId(sub, List.of(e1, e3));
+        @DisplayName("Picks first free numeric suffix when a gap exists")
+        void picks_firstFreeSuffix_whenGapExists() {
+            var e1 = SubscriptionTestFactory.subscription("sub-123-ai");
+            var e3 = SubscriptionTestFactory.subscription("sub-123-ai-3");
+            e1.setChatId(123L);
+            e3.setChatId(123L);
+
+            var filter = SubscriptionTestFactory.filter(List.of("AI"), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
+            var id = generator.generateUniqueId(sub, List.of(e1, e3));
             assertEquals("sub-123-ai-2", id);
         }
 
         @Test
-        @DisplayName("Result does not depend on the order of existing IDs")
-        void existingOrderDoesNotAffectResult() {
-            Subscription e1 = withIdAndChat("sub-123-ai", 123L);
-            Subscription e2 = withIdAndChat("sub-123-ai-2", 123L);
-            Subscription sub = makeSub(123L, List.of("AI"));
+        @DisplayName("Result does not depend on order of existing IDs")
+        void existingOrder_doesNotAffect_result() {
+            var e1 = SubscriptionTestFactory.subscription("sub-123-ai");
+            var e2 = SubscriptionTestFactory.subscription("sub-123-ai-2");
+            e1.setChatId(123L);
+            e2.setChatId(123L);
 
-            String a = generator.generateUniqueId(sub, List.of(e1, e2));
-            String b = generator.generateUniqueId(sub, List.of(e2, e1));
+            var filter = SubscriptionTestFactory.filter(List.of("AI"), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
+            var a = generator.generateUniqueId(sub, List.of(e1, e2));
+            var b = generator.generateUniqueId(sub, List.of(e2, e1));
             assertEquals(a, b);
         }
-
     }
 
     @Nested
-    @DisplayName("Keyword validation:")
-    class KeywordValidation {
+    @DisplayName("Input validation")
+    class InputValidation {
 
         @Test
         @DisplayName("Throws when subscription has no keywords")
-        void throwsWhenNoKeywords() {
-            Subscription sub = makeSub(123L, List.of());
+        void generate_withNoKeywords_throwsException() {
+            var filter = SubscriptionTestFactory.filter(List.of(), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
             assertThrows(IllegalArgumentException.class,
                     () -> generator.generateUniqueId(sub, List.of()));
         }
 
         @Test
         @DisplayName("Throws when first keyword contains only whitespace")
-        void throwsWhenKeywordIsOnlyWhitespace() {
-            Subscription sub = makeSub(123L, List.of("   \t\n  "));
+        void generate_withOnlyWhitespaceKeyword_throwsException() {
+            var filter = SubscriptionTestFactory.filter(List.of("   \t\n  "), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
             assertThrows(IllegalArgumentException.class,
                     () -> generator.generateUniqueId(sub, List.of()));
         }
     }
 
     @Nested
-    @DisplayName("Slug transformation:")
+    @DisplayName("Slug transformation")
     class SlugTransformation {
 
-        @Test
-        @DisplayName("Throws when slug becomes empty after trimming")
-        void throwsWhenSlugBecomesEmpty() {
-            Subscription sub = makeSub(123L, List.of("+++"));
-            assertThrows(IllegalArgumentException.class,
-                    () -> generator.generateUniqueId(sub, List.of()));
+        @Nested
+        @DisplayName("Basic cleanup")
+        class BasicCleanup {
+
+            @Test
+            @DisplayName("Throws when slug becomes empty after cleanup")
+            void slug_becomesEmpty_afterCleanup_throws() {
+                var filter = SubscriptionTestFactory.filter(List.of("+++"), List.of(), "en");
+                var sub = SubscriptionTestFactory.subscription(null, filter, true);
+                sub.setChatId(123L);
+
+                assertThrows(IllegalArgumentException.class,
+                        () -> generator.generateUniqueId(sub, List.of()));
+            }
+
+            @Test
+            @DisplayName("Removes non-alphanumeric characters and lowercases")
+                // overlaps with lowercases_allLetters
+            void slug_removesNonAlnum_andLowercases() {
+                var filter = SubscriptionTestFactory.filter(List.of("AI/ML+++"), List.of(), "en");
+                var sub = SubscriptionTestFactory.subscription(null, filter, true);
+                sub.setChatId(123L);
+
+                var id = generator.generateUniqueId(sub, List.of());
+                assertEquals("sub-123-ai-ml", id);
+            }
+
+            @Test
+            @DisplayName("Lowercases all letters in the slug")
+            void lowercases_allLetters() {
+                var filter = SubscriptionTestFactory.filter(List.of("Ai-ML"), List.of(), "en");
+                var sub = SubscriptionTestFactory.subscription(null, filter, true);
+                sub.setChatId(123L);
+
+                var id = generator.generateUniqueId(sub, List.of());
+                assertEquals("sub-123-ai-ml", id);
+            }
         }
 
-        @Test
-        @DisplayName("Slug removes non-alphanumeric characters and lowercases")
-        void slugRemovesNonAlnumAndLowercases() {
-            Subscription sub = makeSub(123L, List.of("AI/ML+++"));
-            String id = generator.generateUniqueId(sub, List.of());
-            assertEquals("sub-123-ai-ml", id);
+        @Nested
+        @DisplayName("Whitespace and separators")
+        class SeparatorHandling {
+
+            @Test
+            @DisplayName("Collapses multiple whitespaces to a single dash")
+                // overlaps with collapses_mixedSeparators_toSingleDash(), kept for completeness
+            void collapses_whitespace_toSingleDash() {
+                var filter = SubscriptionTestFactory.filter(List.of("  AI    ML  "), List.of(), "en");
+                var sub = SubscriptionTestFactory.subscription(null, filter, true);
+                sub.setChatId(123L);
+
+                var id = generator.generateUniqueId(sub, List.of());
+                assertEquals("sub-123-ai-ml", id);
+            }
+
+            @Test
+            @DisplayName("Collapses mixed separators to single dashes")
+            void collapses_mixedSeparators_toSingleDash() {
+                var filter = SubscriptionTestFactory.filter(List.of("AI...//__++ ML"), List.of(), "en");
+                var sub = SubscriptionTestFactory.subscription(null, filter, true);
+                sub.setChatId(123L);
+
+                var id = generator.generateUniqueId(sub, List.of());
+                assertEquals("sub-123-ai-ml", id);
+            }
+
+            @Test
+            @DisplayName("Removes leading and trailing dashes")
+            void removes_leadingAndTrailing_dashes() {
+                var filter = SubscriptionTestFactory.filter(List.of("--AI--"), List.of(), "en");
+                var sub = SubscriptionTestFactory.subscription(null, filter, true);
+                sub.setChatId(123L);
+
+                var id = generator.generateUniqueId(sub, List.of());
+                assertEquals("sub-123-ai", id);
+            }
         }
 
-        @Test
-        @DisplayName("Slug drops diacritics")
-        void slugDropsDiacritics() {
-            Subscription sub = makeSub(123L, List.of("Göteborg"));
-            String id = generator.generateUniqueId(sub, List.of());
-            assertEquals("sub-123-gteborg", id);
-        }
+        @Nested
+        @DisplayName("Language and symbols")
+        class CharacterHandling {
 
-        @Test
-        @DisplayName("Collapses multiple whitespaces to a single dash and trims edges")
-        void collapsesWhitespaceToSingleDash() {
-            Subscription sub = makeSub(123L, List.of("  AI    ML  "));
-            String id = generator.generateUniqueId(sub, List.of());
-            assertEquals("sub-123-ai-ml", id);
-        }
+            @Test
+            @DisplayName("Drops diacritics")
+            void drops_diacritics() {
+                var filter = SubscriptionTestFactory.filter(List.of("Göteborg"), List.of(), "en");
+                var sub = SubscriptionTestFactory.subscription(null, filter, true);
+                sub.setChatId(123L);
 
-        @Test
-        @DisplayName("Collapses mixed separators to single dashes between tokens")
-        void collapsesMixedSeparators() {
-            Subscription sub = makeSub(123L, List.of("AI...//__++ ML"));
-            String id = generator.generateUniqueId(sub, List.of());
-            assertEquals("sub-123-ai-ml", id);
-        }
+                var id = generator.generateUniqueId(sub, List.of());
+                assertEquals("sub-123-gteborg", id);
+            }
 
-        @Test
-        @DisplayName("Removes leading and trailing dashes produced by cleanup")
-        void removesLeadingAndTrailingDashes() {
-            Subscription sub = makeSub(123L, List.of("--AI--"));
-            String id = generator.generateUniqueId(sub, List.of());
-            assertEquals("sub-123-ai", id);
-        }
+            @Test
+            @DisplayName("Drops emoji and symbols without leaving artifacts")
+            void drops_emoji_andSymbols() {
+                var filter = SubscriptionTestFactory.filter(List.of("AI🔥™"), List.of(), "en");
+                var sub = SubscriptionTestFactory.subscription(null, filter, true);
+                sub.setChatId(123L);
 
-        @Test
-        @DisplayName("Lowercases all letters in the slug")
-        void lowercasesAllLetters() {
-            Subscription sub = makeSub(123L, List.of("Ai-ML"));
-            String id = generator.generateUniqueId(sub, List.of());
-            assertEquals("sub-123-ai-ml", id);
-        }
+                var id = generator.generateUniqueId(sub, List.of());
+                assertEquals("sub-123-ai", id);
+            }
 
-        @Test
-        @DisplayName("Drops emoji and symbols without leaving artifacts")
-        void dropsEmojiAndSymbols() {
-            Subscription sub = makeSub(123L, List.of("AI🔥™"));
-            String id = generator.generateUniqueId(sub, List.of());
-            assertEquals("sub-123-ai", id);
-        }
+            @Test
+            @DisplayName("Drops non-ASCII letters consistently")
+            void drops_nonAsciiLetters_consistently() {
+                var filter = SubscriptionTestFactory.filter(List.of("München"), List.of(), "en");
+                var sub = SubscriptionTestFactory.subscription(null, filter, true);
+                sub.setChatId(123L);
 
-        @Test
-        @DisplayName("Drops non-ASCII letters consistently")
-        void dropsNonAsciiLettersConsistently() {
-            Subscription sub = makeSub(123L, List.of("München"));
-            String id = generator.generateUniqueId(sub, List.of());
-            assertEquals("sub-123-mnchen", id);
+                var id = generator.generateUniqueId(sub, List.of());
+                assertEquals("sub-123-mnchen", id);
+            }
         }
     }
 
     @Nested
-    @DisplayName("Collision handling:")
+    @DisplayName("Collision handling")
     class CollisionHandling {
 
         @Test
         @DisplayName("Ignores collisions from subscriptions in different chats")
-        void ignoresCollisionsAcrossChats() {
-            Subscription otherChat = withIdAndChat("sub-999-ai", 999L);
+            // overlaps with sameKeyword_acrossDifferentChats_doesNotCollide(), kept for completeness
+        void ignores_collisions_acrossChats() {
+            var otherChat = SubscriptionTestFactory.subscription("sub-999-ai");
+            otherChat.setChatId(999L);
 
-            Subscription sub = makeSub(123L, List.of("AI"));
-            String id = generator.generateUniqueId(sub, List.of(otherChat));
+            var filter = SubscriptionTestFactory.filter(List.of("AI"), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
+            var id = generator.generateUniqueId(sub, List.of(otherChat));
             assertEquals("sub-123-ai", id);
         }
 
         @Test
         @DisplayName("Ignores existing subscriptions with null IDs in collision checks")
-        void ignoresNullIdsInExisting() {
-            Subscription e1 = withIdAndChat(null, 123L);
-            Subscription sub = makeSub(123L, List.of("AI"));
-            String id = generator.generateUniqueId(sub, List.of(e1));
+        void ignores_nullIds_inExisting() {
+            var e1 = SubscriptionTestFactory.subscription((String) null);
+            e1.setChatId(123L);
+
+            var filter = SubscriptionTestFactory.filter(List.of("AI"), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
+            var id = generator.generateUniqueId(sub, List.of(e1));
             assertEquals("sub-123-ai", id);
         }
 
         @Test
-        @DisplayName("Does not add suffix when keyword differs in the same chat")
-        void noSuffixWhenDifferentKeywordInSameChat() {
-            Subscription existing = withIdAndChat("sub-123-ai", 123L);
-            Subscription sub = makeSub(123L, List.of("ML"));
-            String id = generator.generateUniqueId(sub, List.of(existing));
+        @DisplayName("Does not add suffix when keyword differs in same chat")
+            // overlaps with caseSensitive_existingId_doesNotCollide
+        void noSuffix_when_differentKeyword_inSameChat() {
+            var existing = SubscriptionTestFactory.subscription("sub-123-ai");
+            existing.setChatId(123L);
+
+            var filter = SubscriptionTestFactory.filter(List.of("ML"), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
+            var id = generator.generateUniqueId(sub, List.of(existing));
             assertEquals("sub-123-ml", id);
         }
 
         @Test
         @DisplayName("String match is case-sensitive")
-        void caseSensitiveExistingIdDoesNotCollide() {
-            Subscription existing = withIdAndChat("sub-123-AI", 123L);
-            Subscription sub = makeSub(123L, List.of("AI"));
-            String id = generator.generateUniqueId(sub, List.of(existing));
+        void caseSensitive_existingId_doesNotCollide() {
+            var existing = SubscriptionTestFactory.subscription("sub-123-AI");
+            existing.setChatId(123L);
+
+            var filter = SubscriptionTestFactory.filter(List.of("AI"), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
+            var id = generator.generateUniqueId(sub, List.of(existing));
             assertEquals("sub-123-ai", id);
         }
 
         @Test
         @DisplayName("Same keyword in different chats never collides or adds suffix")
-        void sameKeywordAcrossDifferentChatsDoesNotCollide() {
-            Subscription otherChat1 = withIdAndChat("sub-111-ai", 111L);
-            Subscription otherChat2 = withIdAndChat("sub-222-ai", 222L);
+        void sameKeyword_acrossDifferentChats_doesNotCollide() {
+            var otherChat1 = SubscriptionTestFactory.subscription("sub-111-ai");
+            var otherChat2 = SubscriptionTestFactory.subscription("sub-222-ai");
+            otherChat1.setChatId(111L);
+            otherChat2.setChatId(222L);
 
-            Subscription sub = makeSub(123L, List.of("AI"));
-            String id = generator.generateUniqueId(sub, List.of(otherChat1, otherChat2));
+            var filter = SubscriptionTestFactory.filter(List.of("AI"), List.of(), "en");
+            var sub = SubscriptionTestFactory.subscription(null, filter, true);
+            sub.setChatId(123L);
+
+            var id = generator.generateUniqueId(sub, List.of(otherChat1, otherChat2));
             assertEquals("sub-123-ai", id);
         }
-    }
-
-    // --- Helpers ---
-
-    private Subscription makeSub(long chatId, List<String> keywords) {
-        Subscription sub = new Subscription();
-        sub.setChatId(chatId);
-        SubscriptionFilter f = new SubscriptionFilter();
-        f.setKeywords(keywords);
-        sub.setFilter(f);
-        sub.setSchedule(SchedulePreset.EVENING);
-        return sub;
-    }
-
-    private Subscription withIdAndChat(String id, long chatId) {
-        Subscription s = new Subscription();
-        s.setId(id);
-        s.setChatId(chatId);
-        return s;
     }
 }

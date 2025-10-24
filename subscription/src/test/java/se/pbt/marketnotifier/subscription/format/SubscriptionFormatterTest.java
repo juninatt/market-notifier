@@ -10,13 +10,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("SubscriptionFormatter:")
+@DisplayName("SubscriptionFormatter")
 class SubscriptionFormatterTest {
 
     private final SubscriptionFormatter formatter = new SubscriptionFormatter();
 
     @Nested
-    @DisplayName("Basic formatting:")
+    @DisplayName("Basic formatting")
     class BasicFormatting {
 
         @Test
@@ -56,8 +56,19 @@ class SubscriptionFormatterTest {
     }
 
     @Nested
-    @DisplayName("Null safety and fallbacks:")
+    @DisplayName("Null safety and fallbacks")
     class NullSafety {
+
+        @Test
+        @DisplayName("Handles null filter safely")
+        void formatsSubscription_whenFilterIsNull_usesFallbackValues() {
+            Subscription sub = SubscriptionTestFactory.subscriptionWithIdOnly("sub-3");
+
+            String result = formatter.format(sub);
+
+            assertTrue(result.contains("(no keywords)"));
+            assertTrue(result.contains("(unknown)"));
+        }
 
         @Test
         @DisplayName("Returns placeholder when subscription is null")
@@ -79,17 +90,6 @@ class SubscriptionFormatterTest {
             String result = formatter.format(sub);
 
             assertTrue(result.contains("ID: (no id)"));
-        }
-
-        @Test
-        @DisplayName("Handles null filter safely")
-        void formatsSubscription_whenFilterIsNull_usesFallbackValues() {
-            Subscription sub = SubscriptionTestFactory.subscriptionWithIdOnly("sub-3");
-
-            String result = formatter.format(sub);
-
-            assertTrue(result.contains("(no keywords)"));
-            assertTrue(result.contains("(unknown)"));
         }
 
         @Test
@@ -135,7 +135,7 @@ class SubscriptionFormatterTest {
     }
 
     @Nested
-    @DisplayName("Keyword formatting:")
+    @DisplayName("Keyword formatting")
     class KeywordFormatting {
 
         @Test

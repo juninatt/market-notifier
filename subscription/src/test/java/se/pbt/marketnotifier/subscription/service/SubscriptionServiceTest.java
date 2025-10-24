@@ -38,7 +38,7 @@ class SubscriptionServiceTest {
     }
 
     @Nested
-    @DisplayName("Save operations:")
+    @DisplayName("Save operations")
     class SaveOperation {
 
         @Test
@@ -95,7 +95,7 @@ class SubscriptionServiceTest {
     }
 
     @Nested
-    @DisplayName("Listing subscriptions:")
+    @DisplayName("Listing subscriptions")
     class Listing {
 
         @Test
@@ -138,7 +138,7 @@ class SubscriptionServiceTest {
     }
 
     @Nested
-    @DisplayName("Remove operations:")
+    @DisplayName("Remove operations")
     class RemoveOperation {
 
         @Test
