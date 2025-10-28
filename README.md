@@ -1,8 +1,8 @@
-# Market Notifier
+# Telegram Market Notifier
 
-**Market Notifier** is a personal Java project built with Maven and Spring Boot.  
+**Telegram Market Notifier** is a personal Java project built with Maven and Spring Boot.  
 It provides a modular, scheduled news subscription service with multiple sources (e.g., [Finnhub](https://finnhub.io/), [Marketaux](https://www.marketaux.com/))
-and **delivers notifications via Telegram** using the [Telegram Bot API](https://core.telegram.org/bots/api)
+and delivers news updates via Telegram using the [Telegram Bot API](https://core.telegram.org/bots/api)
 
 Users interact with the application through a Telegram bot, where they can create and manage news subscriptions.  
 By sending simple commands such as `/subscribe <keyword>` or `/list`, the bot allows users to follow specific topics and receive financial news updates directly in Telegram.
@@ -28,7 +28,7 @@ Java 17+, Maven, and accounts for [Finnhub](https://finnhub.io), [Marketaux](htt
 ## 🧩 Project structure
 
 ```text
-marketnotifier/
+telegram-market-notifier/
  ├── app-runner/         # Application entry point and global configuration
  ├── core/               # Shared logic, models and utilities
  ├── newsprovider/       # Modules for fetching financial news (e.g. Finnhub, Marketaux)
