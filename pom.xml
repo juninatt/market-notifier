@@ -12,7 +12,7 @@
         <module>app-runner</module>
         <module>core</module>
         <module>newsprovider</module>
-        <module>notifier</module>
+        <module>telegram</module>
         <module>subscription</module>
     </modules>
 
