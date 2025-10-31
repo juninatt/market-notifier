@@ -7,7 +7,9 @@ and delivers automated, scheduled updates directly through [Telegram](https://te
 Users interact with the application via the [Telegram Bot API](https://core.telegram.org/bots/api), where they can create and manage news subscriptions.  
 By sending simple commands such as `/subscribe <keyword>` or `/list`, the bot allows users to follow specific topics and receive financial news updates directly in Telegram.
 
-### News providers
+For a more detailed usage guide, including full `/subscribe` syntax, examples, and parameter rules, see the [How to Use guide](_docs/how-to-use.md).
+
+### Market data providers 
 
 - **Finnhub**  
 Financial data API that offers a wide range of information, including general business news.
@@ -29,7 +31,7 @@ Java 17+, Maven, and accounts for [Finnhub](https://finnhub.io), [Marketaux](htt
 telegram-market-notifier/
  ├── app-runner/         # Application entry point and global configuration
  ├── core/               # Shared logic, models, and utilities
- ├── sources/            # Financial data sources (e.g. Finnhub, Marketaux)
+ ├── sources/            # Integrations for external financial news APIs
  ├── telegram/           # Telegram integration and message delivery
  └── subscription/       # Handles user subscriptions and scheduling
 ```
