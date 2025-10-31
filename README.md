@@ -1,26 +1,24 @@
 # Telegram Market Notifier
 
-**Telegram Market Notifier** is a personal Java project built with Maven and Spring Boot.  
-It provides a modular, scheduled news subscription service with multiple sources (e.g., [Finnhub](https://finnhub.io/), [Marketaux](https://www.marketaux.com/))
-and delivers news updates via Telegram using the [Telegram Bot API](https://core.telegram.org/bots/api)
+**Telegram Market Notifier** is a personal Java project built with Maven and Spring Boot.
+It integrates multiple financial data providers (e.g., [Finnhub](https://finnhub.io/), [Marketaux](https://www.marketaux.com/))
+and delivers automated, scheduled updates directly through [Telegram](https://telegram.org/).
 
-Users interact with the application through a Telegram bot, where they can create and manage news subscriptions.  
+Users interact with the application via the [Telegram Bot API](https://core.telegram.org/bots/api), where they can create and manage news subscriptions.  
 By sending simple commands such as `/subscribe <keyword>` or `/list`, the bot allows users to follow specific topics and receive financial news updates directly in Telegram.
 
 ### News providers
+
 - **Finnhub**  
 Financial data API that offers a wide range of information, including general business news.
 
 - **Marketaux**  
 Financial news API focused on delivering headline articles filtered by criteria like company, region, or language.
 
-### Notifiers
-- **Telegram**  
-Cloud-based chat platform with private chats, large groups, and one-way broadcast channels.
-
 ---
 
 ## ✅ Requirements
+
 Java 17+, Maven, and accounts for [Finnhub](https://finnhub.io), [Marketaux](https://marketaux.com), and [Telegram](https://core.telegram.org/bots/api)
 
 ---
@@ -30,23 +28,25 @@ Java 17+, Maven, and accounts for [Finnhub](https://finnhub.io), [Marketaux](htt
 ```text
 telegram-market-notifier/
  ├── app-runner/         # Application entry point and global configuration
- ├── core/               # Shared logic, models and utilities
- ├── newsprovider/       # Modules for fetching financial news (e.g. Finnhub, Marketaux)
- ├── notifier/           # Notification channels (e.g. Telegram)
+ ├── core/               # Shared logic, models, and utilities
+ ├── sources/            # Financial data sources (e.g. Finnhub, Marketaux)
+ ├── telegram/           # Telegram integration and message delivery
  └── subscription/       # Handles user subscriptions and scheduling
 ```
 ---
 
 ## ⚙️ Configuration
+
 Before running the application, make sure you have valid API tokens for **Finnhub**, **Marketaux**, and a **Telegram bot token**.
 
 ### 1) Get API keys / tokens
+
 **Finnhub / Marketaux (news sources)**
 - Sign up to get free API keys:
 - [finnhub.io](https://finnhub.io)
 - [marketaux.com](https://marketaux.com)
 
-**Telegram (notification channel)**
+**Telegram**
 1. In Telegram, start a chat with **@BotFather**.
 2. Send `/newbot`, follow the prompts (choose a name and a unique username ending in `bot`).
 3. BotFather will reply with your **bot token** — keep it secret.
@@ -60,9 +60,10 @@ Before running the application, make sure you have valid API tokens for **Finnhu
 ```
 
 ### 2) Configure application.yml
-A central `application.yml` in `app-runner/resources` includes separate YAML files for each provider and channel.
 
+A central `application.yml` in `app-runner/resources` loads separate YAML files for each data source and the Telegram module.
 **Configuration file structure:**
+
 ```yaml
 app-runner/  
 └── src/main/resources/  
@@ -79,6 +80,7 @@ All configuration files are loaded automatically when the application starts.
 ---
 
 ## ▶️ Run
+
 To run the application, first build all modules and generate the necessary artifacts using Maven.
 
 From the project root:
@@ -92,6 +94,7 @@ Once the build is complete, start the application with Spring Boot:
 ```
 
 This will:
+
 1. Load the main configuration from `app-runner/resources/application.yml`.
 2. Import module-specific configurations for Telegram, Finnhub, and Marketaux.
 3. Initialize all services and start scheduled background jobs.
@@ -99,5 +102,6 @@ This will:
 ---
 
 ## 💻 Development Notes
+
 Lombok is used in this project so if you're using an IDE, make sure annotation processing is enabled in your settings.
 No additional setup is needed when building or running from the command line with Maven.
