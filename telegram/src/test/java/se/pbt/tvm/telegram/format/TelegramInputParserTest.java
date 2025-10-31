@@ -193,7 +193,7 @@ class TelegramInputParserTest {
             var result = parser.parseSubscribeCommand(new TelegramCommand(1L, "/subscribe AI en 5")
             );
 
-            assertNull(result.schedule()); // factory will apply default
+            assertNull(result.schedule()); // mapper will apply default
             assertEquals("en", result.language());
             assertEquals(List.of("AI"), result.keywords());
         }
