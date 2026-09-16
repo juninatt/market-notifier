@@ -29,6 +29,15 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
+        <!-- JSON mapping (ObjectMapper, JsonNode) used directly by the mappers/services below.
+             Declared explicitly rather than relying on it arriving transitively via
+             spring-boot-starter-webflux, since that transitive shape isn't guaranteed to
+             stay the same across Spring Boot versions. -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
