@@ -1,7 +1,7 @@
 package se.pbt.mn.email.notification;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -77,14 +77,14 @@ class EmailNotificationChannelTest {
             assertThat(recorded.getPath()).isEqualTo("/emails");
 
             JsonNode json = mapper.readTree(recorded.getBody().readUtf8());
-            assertThat(json.get("from").asText()).isEqualTo("news@example.com");
-            assertThat(json.get("to").get(0).asText()).isEqualTo("user@outlook.com");
-            assertThat(json.get("subject").asText()).contains("Tesla rallies");
-            assertThat(json.get("html").asText()).contains("<h2>Tesla rallies</h2>");
-            assertThat(json.get("html").asText()).contains("Shares jump.");
-            assertThat(json.get("html").asText()).contains("TSLA");
-            assertThat(json.get("html").asText()).contains("Reuters");
-            assertThat(json.get("html").asText()).contains("https://example.com");
+            assertThat(json.get("from").asString()).isEqualTo("news@example.com");
+            assertThat(json.get("to").get(0).asString()).isEqualTo("user@outlook.com");
+            assertThat(json.get("subject").asString()).contains("Tesla rallies");
+            assertThat(json.get("html").asString()).contains("<h2>Tesla rallies</h2>");
+            assertThat(json.get("html").asString()).contains("Shares jump.");
+            assertThat(json.get("html").asString()).contains("TSLA");
+            assertThat(json.get("html").asString()).contains("Reuters");
+            assertThat(json.get("html").asString()).contains("https://example.com");
         }
 
         @Test
@@ -96,8 +96,8 @@ class EmailNotificationChannelTest {
 
             var recorded = server.takeRequest();
             JsonNode json = mapper.readTree(recorded.getBody().readUtf8());
-            assertThat(json.get("html").asText()).doesNotContain("<script>");
-            assertThat(json.get("html").asText()).contains("&lt;script&gt;");
+            assertThat(json.get("html").asString()).doesNotContain("<script>");
+            assertThat(json.get("html").asString()).contains("&lt;script&gt;");
         }
     }
 

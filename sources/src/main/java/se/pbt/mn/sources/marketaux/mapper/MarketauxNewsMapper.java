@@ -1,7 +1,7 @@
 package se.pbt.mn.sources.marketaux.mapper;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 import se.pbt.mn.core.news.NewsItem;
 import se.pbt.mn.sources.common.MappingUtils;
 
@@ -22,12 +22,12 @@ public final class MarketauxNewsMapper {
      * Converts a Marketaux JSON node to a {@link NewsItem}, applying formatting rules and safe defaults for missing or invalid values.
      */
     public static NewsItem map(JsonNode n) {
-        String title = MappingUtils.validateTitle(n.path("title").asText(""));
+        String title = MappingUtils.validateTitle(n.path("title").asString(""));
         String description = MappingUtils.parseTextField(n, "description");
-        URI url = MappingUtils.parseUri(n.path("url").asText(null));
-        URI imageUrl = MappingUtils.parseUri(n.path("image_url").asText(null));
+        URI url = MappingUtils.parseUri(n.path("url").asString(null));
+        URI imageUrl = MappingUtils.parseUri(n.path("image_url").asString(null));
 
-        Instant publishedAt = MappingUtils.parseInstant(n.path("published_at").asText(null));
+        Instant publishedAt = MappingUtils.parseInstant(n.path("published_at").asString(null));
         if (publishedAt == null) {
             publishedAt = Instant.EPOCH;
         }
@@ -40,8 +40,8 @@ public final class MarketauxNewsMapper {
         );
 
         Map<String, String> extras = new LinkedHashMap<>();
-        MappingUtils.putIfHasText(extras, "marketaux.snippet", n.path("snippet").asText(null));
-        MappingUtils.putIfHasText(extras, "marketaux.uuid", n.path("uuid").asText(null));
+        MappingUtils.putIfHasText(extras, "marketaux.snippet", n.path("snippet").asString(null));
+        MappingUtils.putIfHasText(extras, "marketaux.uuid", n.path("uuid").asString(null));
 
         String language = MappingUtils.parseTextField(n, "language");
 

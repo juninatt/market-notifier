@@ -1,7 +1,6 @@
 package se.pbt.mn.subscription.persistence;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -45,7 +44,7 @@ public class SubscriptionStorage {
                 return new ArrayList<>();
             }
 
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            YAMLMapper mapper = new YAMLMapper();
             SubscriptionListWrapper wrapper = mapper.readValue(input, SubscriptionListWrapper.class);
             return wrapper.getSubscriptions();
         } catch (Exception e) {
@@ -83,7 +82,7 @@ public class SubscriptionStorage {
      */
     public void saveSubscriptions(List<Subscription> subscriptions, String filePath) {
         try {
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            YAMLMapper mapper = new YAMLMapper();
             SubscriptionListWrapper wrapper = new SubscriptionListWrapper();
             wrapper.setSubscriptions(subscriptions);
 

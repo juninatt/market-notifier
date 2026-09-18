@@ -1,28 +1,28 @@
 ---
 subscriptions:
-- id: "ai-alerts"
-  chatId: 123456789
+- chatId: 123456789
   email: null
-  schedule: "MORNING"
-  timezone: "Europe/Stockholm"
+  enabled: true
   filter:
     keywords:
     - "AI"
     - "machine learning"
-    tickers: []
     language: "en"
+    tickers: []
+  id: "ai-alerts"
   maxItems: 5
-  enabled: true
-- id: "green-news"
-  chatId: 0
-  email: null
-  schedule: "MORNING_EVENING"
+  schedule: "MORNING"
   timezone: "Europe/Stockholm"
+- chatId: 0
+  email: null
+  enabled: true
   filter:
     keywords:
     - "solar"
     - "wind"
-    tickers: []
     language: "en"
+    tickers: []
+  id: "green-news"
   maxItems: 5
-  enabled: true
+  schedule: "MORNING_EVENING"
+  timezone: "Europe/Stockholm"

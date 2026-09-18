@@ -1,7 +1,7 @@
 package se.pbt.mn.telegram.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
@@ -53,8 +53,8 @@ class TelegramApiClientTest {
         // verify JSON structure semantically
         JsonNode json = mapper.readTree(recorded.getBody().readUtf8());
         assertThat(json.get("chat_id").asLong()).isEqualTo(123L);
-        assertThat(json.get("text").asText()).isEqualTo("hello");
-        assertThat(json.get("parse_mode").asText()).isEqualTo("MarkdownV2");
+        assertThat(json.get("text").asString()).isEqualTo("hello");
+        assertThat(json.get("parse_mode").asString()).isEqualTo("MarkdownV2");
     }
 
     @Test
@@ -105,8 +105,8 @@ class TelegramApiClientTest {
 
         assertThat(json.get("chat_id").asLong()).isEqualTo(7L);
         String expected = "a \"quote\" and a backslash \\";
-        assertThat(json.get("text").asText()).isEqualTo(expected);
-        assertThat(json.get("parse_mode").asText()).isEqualTo("MarkdownV2");
+        assertThat(json.get("text").asString()).isEqualTo(expected);
+        assertThat(json.get("parse_mode").asString()).isEqualTo("MarkdownV2");
     }
 
     @ParameterizedTest(name = "Preserves Unicode sample → {0}")
@@ -123,7 +123,7 @@ class TelegramApiClientTest {
         // then
         var recorded = server.takeRequest();
         JsonNode json = mapper.readTree(recorded.getBody().readUtf8());
-        assertThat(json.get("text").asText()).isEqualTo(sample);
+        assertThat(json.get("text").asString()).isEqualTo(sample);
     }
 
     @Test
@@ -141,8 +141,8 @@ class TelegramApiClientTest {
         var recorded = server.takeRequest();
         JsonNode json = mapper.readTree(recorded.getBody().readUtf8());
         assertThat(json.get("chat_id").asLong()).isEqualTo(9L);
-        assertThat(json.get("text").asText()).isEqualTo(preFormatted);
-        assertThat(json.get("parse_mode").asText()).isEqualTo("MarkdownV2");
+        assertThat(json.get("text").asString()).isEqualTo(preFormatted);
+        assertThat(json.get("parse_mode").asString()).isEqualTo("MarkdownV2");
     }
 
     @Test

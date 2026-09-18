@@ -1,6 +1,6 @@
 package se.pbt.mn.telegram.polling;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
@@ -239,7 +239,7 @@ public class TelegramLongPollingRunner implements SmartLifecycle {
         if (textNode == null || textNode.isNull())
             return Optional.empty();
 
-        String text = textNode.asText();
+        String text = textNode.asString();
         if (text == null || text.isBlank())
             return Optional.empty();
 

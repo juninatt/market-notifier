@@ -1,7 +1,7 @@
 package se.pbt.mn.sources.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -63,7 +63,7 @@ public final class MappingUtils {
      */
     public static String parseTextField(JsonNode node, String field) {
         if (node == null) return null;
-        String v = node.path(field).asText(null);
+        String v = node.path(field).asString(null);
         return hasText(v) ? v : null;
     }
 
