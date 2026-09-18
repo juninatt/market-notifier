@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/juninatt/market-notifier/compare/v1.0.2...v1.1.0) (2026-09-18)
+
+
+### Features
+
+* **build:** migrate to Jackson 3 on Spring Boot 4.1.1 ([baec2f7](https://github.com/juninatt/market-notifier/commit/baec2f794f6bb11dc487d6a6636f61297cb0b4d6))
+
+
+### Bug Fixes
+
+* **build:** pin jackson, netty, and logback to patched versions ([d65a68b](https://github.com/juninatt/market-notifier/commit/d65a68b88a21e437a4658fb0fe4f61c08317b808))
+
 ## [1.0.2](https://github.com/juninatt/market-notifier/compare/v1.0.1...v1.0.2) (2026-09-16)
 
 
