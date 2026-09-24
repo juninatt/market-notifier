@@ -106,12 +106,14 @@ app-runner/
 ├── application-marketaux.yml
 ├── application-telegram.yml
 ├── application-subscription.yml
-└── application-email.yml
+├── application-email.yml
+└── application-watchlist.yml
 ```
 
 Each file contains placeholders for its own API tokens and settings, read from environment variables:
 `FINNHUB_API_KEY`, `MARKETAUX_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_IDS`, `RESEND_API_KEY`, `RESEND_FROM_ADDRESS`,
-and (optional, for subscribing by email) `EMAIL_IMAP_ENABLED`, `EMAIL_IMAP_HOST`, `EMAIL_IMAP_USERNAME`, `EMAIL_IMAP_PASSWORD`.
+(optional, for subscribing by email) `EMAIL_IMAP_ENABLED`, `EMAIL_IMAP_HOST`, `EMAIL_IMAP_USERNAME`, `EMAIL_IMAP_PASSWORD`,
+and (optional, for the startup watchlist digest -- see below) `WATCHLIST_DIGEST_ENABLED`, `WATCHLIST_DIGEST_TOP_PER_CATEGORY`.
 All configuration files are loaded automatically when the application starts.
 
 ### 3) Enable email delivery for a subscription manually
@@ -133,6 +135,29 @@ subscriptions:
 ```
 
 Leave `email` unset (or `null`) to only deliver via Telegram for that subscription.
+
+### 4) Startup watchlist digest (optional)
+
+In addition to scheduled subscriptions, you can maintain a personal watchlist that gets emailed to you once, every time the application starts -- handy for firing off `mvn spring-boot:run` in the morning and getting a digest immediately instead of waiting for the next scheduled delivery.
+
+Create a `watchlist.yml` file (path set by `watchlist.storage.path`, default `watchlist.yml` in the working directory):
+
+```yaml
+email: "you@example.com"
+companies:
+  - "Tesla"
+  - "TSLA"
+  - "Apple"
+categories:
+  - "Space"
+  - "AI"
+  - "Quantum Computing"
+```
+
+- `companies` -- tickers or company names. Every news item matching any of them, from every configured source, is included with no upper limit.
+- `categories` -- free-text topics matched case-insensitively against article titles and descriptions (so `"AI"`, `"ai"`, and `"Ai"` are equivalent). Only the most recently published items per category are included, up to `watchlist.digest.top-per-category` (default `10`).
+
+If the file is missing, empty, or nothing in it currently matches any news, no email is sent. Set `watchlist.digest.enabled: false` (or `WATCHLIST_DIGEST_ENABLED=false`) to keep the file around without triggering a send on every startup.
 
 ---
 
@@ -172,8 +197,9 @@ Once the build is complete, start the application with Spring Boot:
 This will:
 
 1. Load the main configuration from `app-runner/resources/application.yml`.
-2. Import module-specific configurations for Telegram, Finnhub, Marketaux, subscriptions, and email.
-3. Initialize all services and start the news dispatch scheduler, which checks every minute for a due schedule preset, fetches and groups news from all sources, and delivers matching items to each subscription's configured channels.
+2. Import module-specific configurations for Telegram, Finnhub, Marketaux, subscriptions, email, and the watchlist.
+3. Send the one-off watchlist digest, if `watchlist.yml` exists (see [Startup watchlist digest](#4-startup-watchlist-digest-optional)).
+4. Initialize all services and start the news dispatch scheduler, which checks every minute for a due schedule preset, fetches and groups news from all sources, and delivers matching items to each subscription's configured channels.
 
 ---
 

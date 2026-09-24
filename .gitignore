@@ -13,6 +13,7 @@ target/
 ### Local runtime data (generated at runtime, not source) ###
 /subscription/subscriptions.yml
 /subscriptions/
+/watchlist.yml
 
 ### IntelliJ IDEA ###
 .idea/
