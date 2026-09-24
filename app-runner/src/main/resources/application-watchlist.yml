@@ -1,6 +1,0 @@
-watchlist:
-  storage:
-    path: "watchlist.yml"
-  digest:
-    enabled: ${WATCHLIST_DIGEST_ENABLED:true}
-    top-per-category: ${WATCHLIST_DIGEST_TOP_PER_CATEGORY:10}
