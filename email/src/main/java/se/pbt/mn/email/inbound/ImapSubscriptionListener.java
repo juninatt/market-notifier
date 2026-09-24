@@ -165,7 +165,7 @@ public class ImapSubscriptionListener implements SmartLifecycle {
             body = extractText(message);
             processMessage(from, body);
         } catch (Exception e) {
-            log.warn("Failed to process inbound subscription email: {} (raw body: '{}')", e, body);
+            log.warn("Failed to process inbound subscription email: {} (raw body: '{}')", e.toString(), body);
         } finally {
             try {
                 message.setFlag(Flags.Flag.SEEN, true);
