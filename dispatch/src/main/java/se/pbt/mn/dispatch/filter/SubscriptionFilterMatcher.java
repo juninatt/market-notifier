@@ -64,7 +64,14 @@ public final class SubscriptionFilterMatcher {
         return keywords.stream().filter(Objects::nonNull).anyMatch(keyword -> matchesText(item, keyword));
     }
 
+    /**
+     * A null or blank term never matches -- otherwise {@code contains("")} would make a stray
+     * empty entry in the subscriptions file match every item.
+     */
     private static boolean matchesText(NewsItem item, String term) {
+        if (term == null || term.isBlank()) {
+            return false;
+        }
         String haystack = (nullToEmpty(item.title()) + " " + nullToEmpty(item.description()))
                 .toLowerCase(Locale.ROOT);
         return haystack.contains(term.toLowerCase(Locale.ROOT));

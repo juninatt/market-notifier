@@ -179,6 +179,13 @@ class SubscriptionFilterMatcherTest {
             assertFalse(SubscriptionFilterMatcher.matchesAnyCompany(news, List.of()));
             assertFalse(SubscriptionFilterMatcher.matchesAnyCompany(news, null));
         }
+
+        @Test
+        @DisplayName("Does not match on a blank company entry")
+        void matchesAnyCompany_withBlankEntry_doesNotMatch() {
+            var news = item("Tesla rallies", "desc", List.of("TSLA"), null);
+            assertFalse(SubscriptionFilterMatcher.matchesAnyCompany(news, List.of("", " ")));
+        }
     }
 
     @Nested
@@ -197,6 +204,14 @@ class SubscriptionFilterMatcherTest {
         void matchesCategory_withNoOverlap_doesNotMatch() {
             var news = item("Tesla rallies", "desc", List.of(), null);
             assertFalse(SubscriptionFilterMatcher.matchesCategory(news, "Space"));
+        }
+
+        @Test
+        @DisplayName("Does not match on a null or blank category")
+        void matchesCategory_withNullOrBlank_doesNotMatch() {
+            var news = item("Tesla rallies", "desc", List.of(), null);
+            assertFalse(SubscriptionFilterMatcher.matchesCategory(news, null));
+            assertFalse(SubscriptionFilterMatcher.matchesCategory(news, " "));
         }
     }
 }

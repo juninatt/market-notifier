@@ -73,6 +73,17 @@ class SubscriptionDigestBuilderTest {
 
             assertTrue(result.isEmpty());
         }
+
+        @Test
+        @DisplayName("Treats a null categories list as empty")
+        void build_withNullCategories_returnsEmpty() {
+            var groups = List.of(group(item("1", "Weather report", List.of(), Instant.EPOCH)));
+            var subscription = subscription(List.of("Tesla"), List.of(), List.of(), null, 10);
+
+            var result = SubscriptionDigestBuilder.build(groups, subscription, 10);
+
+            assertTrue(result.isEmpty());
+        }
     }
 
     @Nested

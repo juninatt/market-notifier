@@ -36,11 +36,9 @@ public final class SubscriptionDigestBuilder {
         SubscriptionFilter filter = subscription.getFilter();
         StringBuilder body = new StringBuilder();
 
-        if (hasKeywordsOrTickers(filter)) {
-            List<NewsGroup> filterMatches = SubscriptionGroupMatcher.match(groups, subscription);
-            if (!filterMatches.isEmpty()) {
-                appendSection(body, MATCHES_HEADING, filterMatches);
-            }
+        List<NewsGroup> filterMatches = SubscriptionGroupMatcher.match(groups, subscription);
+        if (!filterMatches.isEmpty()) {
+            appendSection(body, MATCHES_HEADING, filterMatches);
         }
 
         List<NewsGroup> companyMatches = matchCompanies(groups, filter.getCompanies());
@@ -48,7 +46,8 @@ public final class SubscriptionDigestBuilder {
             appendSection(body, COMPANIES_HEADING, companyMatches);
         }
 
-        for (String category : filter.getCategories()) {
+        List<String> categories = filter.getCategories() == null ? List.of() : filter.getCategories();
+        for (String category : categories) {
             List<NewsGroup> topForCategory = matchCategory(groups, category, topPerCategory);
             if (!topForCategory.isEmpty()) {
                 appendSection(body, category, topForCategory);
@@ -58,16 +57,6 @@ public final class SubscriptionDigestBuilder {
         return body.isEmpty()
                 ? Optional.empty()
                 : Optional.of(new Notification(TITLE, body.toString(), null, null, Instant.now(), List.of()));
-    }
-
-    /**
-     * A filter with neither keywords nor tickers set matches every item (see
-     * {@link SubscriptionFilterMatcher#matches}), which is meaningless for a subscription
-     * that only exists for its companies/categories -- so the "Matches" section is skipped
-     * entirely rather than dumping every fetched item into it.
-     */
-    private static boolean hasKeywordsOrTickers(SubscriptionFilter filter) {
-        return !isEmpty(filter.getKeywords()) || !isEmpty(filter.getTickers());
     }
 
     private static boolean isEmpty(List<String> values) {

@@ -170,6 +170,21 @@ class NewsDispatchSchedulerTest {
             verify(channel).send(eq("1"), any(Notification.class));
             verify(channel).send(eq("2"), any(Notification.class));
         }
+
+        @Test
+        @DisplayName("Does not send arbitrary items to a subscription with only companies/categories")
+        void dispatch_withNoKeywordsOrTickers_sendsNothing() {
+            var sub = subscription(1L, 10, List.of());
+            sub.getFilter().setCompanies(List.of("Tesla"));
+            sub.getFilter().setCategories(List.of("AI"));
+            when(subscriptionService.findEnabledBySchedule(SchedulePreset.MORNING)).thenReturn(List.of(sub));
+            when(sourceA.fetchLatest()).thenReturn(List.of(item("1", "Unrelated weather report", List.of())));
+            when(sourceB.fetchLatest()).thenReturn(List.of());
+
+            scheduler.dispatch(SchedulePreset.MORNING);
+
+            verifyNoInteractions(channel);
+        }
     }
 
     @Nested
