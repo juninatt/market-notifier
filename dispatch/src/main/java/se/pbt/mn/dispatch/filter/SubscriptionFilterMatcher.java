@@ -16,6 +16,10 @@ import java.util.stream.Collectors;
  * be included; within a category, any one of multiple values matching is enough (OR).
  * Language is only enforced when the item declares one — most providers don't tag language,
  * and an unknown language shouldn't silently exclude an otherwise-matching item.
+ * <p>
+ * {@code companies} and {@code categories} are matched separately via
+ * {@link #matchesAnyCompany} and {@link #matchesCategory} — they're independent of
+ * {@link #matches}, not additional categories ANDed into it.
  */
 public final class SubscriptionFilterMatcher {
 
@@ -27,17 +31,43 @@ public final class SubscriptionFilterMatcher {
                 && matchesLanguage(item, filter.getLanguage());
     }
 
+    /**
+     * Whether the item matches any of the given companies, each matched on ticker OR name
+     * (unlike {@link #matches}, where keywords and tickers are separate, ANDed categories).
+     */
+    public static boolean matchesAnyCompany(NewsItem item, List<String> companies) {
+        if (companies == null || companies.isEmpty()) {
+            return false;
+        }
+        return companies.stream().filter(Objects::nonNull).anyMatch(company -> matchesCompany(item, company));
+    }
+
+    private static boolean matchesCompany(NewsItem item, String company) {
+        return matchesTicker(item, company) || matchesText(item, company);
+    }
+
+    /**
+     * Whether the item's title or description contains the given free-text category term.
+     */
+    public static boolean matchesCategory(NewsItem item, String category) {
+        return matchesText(item, category);
+    }
+
+    private static boolean matchesTicker(NewsItem item, String ticker) {
+        return item.tickers() != null && item.tickers().stream().anyMatch(t -> t.equalsIgnoreCase(ticker));
+    }
+
     private static boolean matchesKeywords(NewsItem item, List<String> keywords) {
         if (keywords == null || keywords.isEmpty()) {
             return true;
         }
+        return keywords.stream().filter(Objects::nonNull).anyMatch(keyword -> matchesText(item, keyword));
+    }
+
+    private static boolean matchesText(NewsItem item, String term) {
         String haystack = (nullToEmpty(item.title()) + " " + nullToEmpty(item.description()))
                 .toLowerCase(Locale.ROOT);
-
-        return keywords.stream()
-                .filter(Objects::nonNull)
-                .map(k -> k.toLowerCase(Locale.ROOT))
-                .anyMatch(haystack::contains);
+        return haystack.contains(term.toLowerCase(Locale.ROOT));
     }
 
     private static boolean matchesTickers(NewsItem item, List<String> tickers) {

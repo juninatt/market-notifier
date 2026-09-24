@@ -146,4 +146,57 @@ class SubscriptionFilterMatcherTest {
 
         assertFalse(SubscriptionFilterMatcher.matches(news, filter));
     }
+
+    @Nested
+    @DisplayName("Company matching")
+    class Companies {
+
+        @Test
+        @DisplayName("Matches on ticker regardless of case")
+        void matchesAnyCompany_byTickerDifferentCase_matches() {
+            var news = item("Market update", "desc", List.of("TSLA"), null);
+            assertTrue(SubscriptionFilterMatcher.matchesAnyCompany(news, List.of("tsla")));
+        }
+
+        @Test
+        @DisplayName("Matches on company name appearing in the title or description")
+        void matchesAnyCompany_byName_matches() {
+            var news = item("Tesla unveils new factory", "desc", List.of(), null);
+            assertTrue(SubscriptionFilterMatcher.matchesAnyCompany(news, List.of("Tesla")));
+        }
+
+        @Test
+        @DisplayName("Does not match when neither ticker nor name appear")
+        void matchesAnyCompany_withNoOverlap_doesNotMatch() {
+            var news = item("Weather update", "Rain expected", List.of("AAPL"), null);
+            assertFalse(SubscriptionFilterMatcher.matchesAnyCompany(news, List.of("Tesla")));
+        }
+
+        @Test
+        @DisplayName("Returns false for an empty or null company list")
+        void matchesAnyCompany_withEmptyList_doesNotMatch() {
+            var news = item("Tesla rallies", "desc", List.of(), null);
+            assertFalse(SubscriptionFilterMatcher.matchesAnyCompany(news, List.of()));
+            assertFalse(SubscriptionFilterMatcher.matchesAnyCompany(news, null));
+        }
+    }
+
+    @Nested
+    @DisplayName("Category matching")
+    class Categories {
+
+        @Test
+        @DisplayName("Matches category text case-insensitively")
+        void matchesCategory_withDifferentCase_matches() {
+            var news = item("Breakthrough in quantum computing", "desc", List.of(), null);
+            assertTrue(SubscriptionFilterMatcher.matchesCategory(news, "qUANTUM cOMPUTING"));
+        }
+
+        @Test
+        @DisplayName("Does not match unrelated text")
+        void matchesCategory_withNoOverlap_doesNotMatch() {
+            var news = item("Tesla rallies", "desc", List.of(), null);
+            assertFalse(SubscriptionFilterMatcher.matchesCategory(news, "Space"));
+        }
+    }
 }
