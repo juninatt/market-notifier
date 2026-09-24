@@ -1,9 +1,9 @@
 telegram:
   bot:
-    enabled: true
+    enabled: ${TELEGRAM_BOT_ENABLED:true}
     baseUrl: "https://api.telegram.org"
-    botToken: ${TELEGRAM_BOT_TOKEN}
-    chatIds: ${TELEGRAM_CHAT_IDS}
+    botToken: ${TELEGRAM_BOT_TOKEN:}
+    chatIds: ${TELEGRAM_CHAT_IDS:}
     longPollTimeoutSeconds: 50
     initialOffset: 0
 
