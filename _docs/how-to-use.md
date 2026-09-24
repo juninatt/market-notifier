@@ -120,3 +120,8 @@ Market Notifier also works in Telegram groups or channels:
 - Subscriptions are saved locally in `subscriptions/subscriptions.yml` (configurable via `subscription.storage.path`).
 - Each chat (private or group) has its own section in the file.
 - News delivery frequency is defined by each subscription's schedule preset, dispatched by `NewsDispatchScheduler`.
+- `/subscribe` only sets `keywords`, `tickers`, and `language`. Two more filter fields --
+  `companies` (matches ticker or name, uncapped) and `categories` (top-N most recent per
+  category) -- exist only for hand-editing `subscriptions.yml` directly; see the main
+  [README](../README.md) for their syntax and the `digest-now` profile that sends every
+  enabled subscription immediately instead of waiting for its schedule.

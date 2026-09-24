@@ -37,7 +37,7 @@ A subscription can use either channel, both, or neither (if disabled) — the di
 
 ## ✅ Requirements
 
-Java 17+, Maven, and accounts for [Finnhub](https://finnhub.io), [Marketaux](https://marketaux.com), [Telegram](https://core.telegram.org/bots/api), and — if you want email delivery — [Resend](https://resend.com).
+Java 17+, Maven, and accounts for [Finnhub](https://finnhub.io) and [Marketaux](https://marketaux.com). For delivery, at least one of [Telegram](https://core.telegram.org/bots/api) or [Resend](https://resend.com) (email) -- see [Running Telegram-free](#running-telegram-free).
 
 ---
 
@@ -58,7 +58,7 @@ telegram-market-notifier/
 
 ## ⚙️ Configuration
 
-Before running the application, make sure you have valid API tokens for **Finnhub**, **Marketaux**, a **Telegram bot token**, and — for email delivery — a **Resend API key**.
+Before running the application, make sure you have valid API tokens for **Finnhub** and **Marketaux**, plus at least one delivery channel: a **Telegram bot token** and/or a **Resend API key**.
 
 ### 1) Get API keys / tokens
 
@@ -106,19 +106,31 @@ app-runner/
 ├── application-marketaux.yml
 ├── application-telegram.yml
 ├── application-subscription.yml
-├── application-email.yml
-└── application-watchlist.yml
+└── application-email.yml
 ```
 
 Each file contains placeholders for its own API tokens and settings, read from environment variables:
-`FINNHUB_API_KEY`, `MARKETAUX_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_IDS`, `RESEND_API_KEY`, `RESEND_FROM_ADDRESS`,
+`FINNHUB_API_KEY`, `MARKETAUX_API_KEY`, `RESEND_API_KEY`, `RESEND_FROM_ADDRESS`,
+(optional, Telegram is not required -- see [Running Telegram-free](#running-telegram-free)) `TELEGRAM_BOT_ENABLED`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_IDS`,
 (optional, for subscribing by email) `EMAIL_IMAP_ENABLED`, `EMAIL_IMAP_HOST`, `EMAIL_IMAP_USERNAME`, `EMAIL_IMAP_PASSWORD`,
-and (optional, for the startup watchlist digest -- see below) `WATCHLIST_DIGEST_ENABLED`, `WATCHLIST_DIGEST_TOP_PER_CATEGORY`.
+and (optional, for the `digest-now` profile -- see below) `DIGEST_TOP_PER_CATEGORY`.
 All configuration files are loaded automatically when the application starts.
 
-### 3) Enable email delivery for a subscription manually
+### Running Telegram-free
 
-Subscribing via Telegram or email (see above) sets this automatically. To edit it directly instead, add an `email` field to the subscription's entry in the subscriptions file (path set by `subscription.storage.path`, default `subscriptions.yml`):
+`TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_IDS` can both be left unset. The Telegram bot simply
+stays off (logged once at startup) instead of blocking the rest of the application -- useful if
+you only want email delivery. Set `TELEGRAM_BOT_ENABLED=false` explicitly to silence even that
+log line. The reverse holds too: if you only use Telegram, `RESEND_API_KEY` and
+`RESEND_FROM_ADDRESS` can be left unset -- the email channel just won't deliver anything, with
+no effect on Telegram.
+
+### 3) Editing the subscriptions file directly
+
+Every subscription -- however it was created -- lives in one YAML file (path set by
+`subscription.storage.path`, default `subscriptions/subscriptions.yml`). Subscribing via
+Telegram or email (see above) appends to it automatically; you can also hand-edit it, which is
+the only way to set `companies` and `categories` (not exposed through `/subscribe` syntax yet):
 
 ```yaml
 subscriptions:
@@ -129,35 +141,43 @@ subscriptions:
   filter:
     keywords: ["Tesla"]
     tickers: ["TSLA"]
+    companies: ["Apple", "MSFT"]
+    categories: ["AI", "Space"]
     language: "en"
   maxItems: 10
   enabled: true
 ```
 
-Leave `email` unset (or `null`) to only deliver via Telegram for that subscription.
+- `keywords` / `tickers` / `language` -- the original filter: each non-empty one must match
+  (AND), matched items capped to `maxItems`. Settable via `/subscribe`.
+- `companies` -- tickers or company names, independent of the above. Matches on ticker OR name
+  appearing in the text, with every match included (no cap). Hand-edit only.
+- `categories` -- free-text topics, independent of everything else, matched case-insensitively
+  against title/description (so `"AI"`, `"ai"`, and `"Ai"` are equivalent). Only the most
+  recently published matches per category are included, up to `digest.top-per-category`
+  (default `10`). Hand-edit only.
+- `email` -- ignored entirely by Telegram delivery; only the `email` channel reads it. Leave it
+  unset (or `null`) to only deliver via Telegram.
+- `schedule` -- optional. Omit it entirely for a subscription that should never fire on the
+  recurring scheduler and only ever be sent by the `digest-now` profile below.
 
-### 4) Startup watchlist digest (optional)
+### 4) The `digest-now` profile: send everything right now, once, and exit
 
-In addition to scheduled subscriptions, you can maintain a personal watchlist that gets emailed to you once, every time the application starts -- handy for firing off `mvn spring-boot:run` in the morning and getting a digest immediately instead of waiting for the next scheduled delivery.
+Instead of waiting for a subscription's `schedule` to fire, you can run the application in the
+`digest-now` Spring profile: it sends every **enabled** subscription its own digest exactly
+once -- combining its regular `keywords`/`tickers` matches, its `companies` matches, and its
+`categories` matches into a single message -- then exits the process. The recurring scheduler,
+Telegram polling, and IMAP polling are all excluded under this profile, so nothing else starts
+in the background.
 
-Create a `watchlist.yml` file (path set by `watchlist.storage.path`, default `watchlist.yml` in the working directory):
-
-```yaml
-email: "you@example.com"
-companies:
-  - "Tesla"
-  - "TSLA"
-  - "Apple"
-categories:
-  - "Space"
-  - "AI"
-  - "Quantum Computing"
+```bash
+mvn spring-boot:run -pl app-runner -Dspring-boot.run.profiles=digest-now
 ```
 
-- `companies` -- tickers or company names. Every news item matching any of them, from every configured source, is included with no upper limit.
-- `categories` -- free-text topics matched case-insensitively against article titles and descriptions (so `"AI"`, `"ai"`, and `"Ai"` are equivalent). Only the most recently published items per category are included, up to `watchlist.digest.top-per-category` (default `10`).
-
-If the file is missing, empty, or nothing in it currently matches any news, no email is sent. Set `watchlist.digest.enabled: false` (or `WATCHLIST_DIGEST_ENABLED=false`) to keep the file around without triggering a send on every startup.
+This is the "run it in the morning and get one email/Telegram message right away" use case.
+A subscription with no `schedule` at all is only ever reachable this way. If nothing in a
+subscription's filter currently matches any fetched news, that subscription is silently
+skipped -- no blank message is sent.
 
 ---
 
@@ -197,9 +217,12 @@ Once the build is complete, start the application with Spring Boot:
 This will:
 
 1. Load the main configuration from `app-runner/resources/application.yml`.
-2. Import module-specific configurations for Telegram, Finnhub, Marketaux, subscriptions, email, and the watchlist.
-3. Send the one-off watchlist digest, if `watchlist.yml` exists (see [Startup watchlist digest](#4-startup-watchlist-digest-optional)).
-4. Initialize all services and start the news dispatch scheduler, which checks every minute for a due schedule preset, fetches and groups news from all sources, and delivers matching items to each subscription's configured channels.
+2. Import module-specific configurations for Telegram, Finnhub, Marketaux, subscriptions, and email.
+3. Initialize all services and start the news dispatch scheduler, which checks every minute for a due schedule preset, fetches and groups news from all sources, and delivers matching items to each subscription's configured channels.
+
+Run with `-Dspring-boot.run.profiles=digest-now` instead to skip the recurring scheduler
+entirely and send every enabled subscription's digest once immediately -- see
+[The `digest-now` profile](#4-the-digest-now-profile-send-everything-right-now-once-and-exit).
 
 ---
 
