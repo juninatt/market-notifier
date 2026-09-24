@@ -4,6 +4,8 @@ subscriptions:
   email: null
   enabled: true
   filter:
+    categories: []
+    companies: []
     keywords:
     - "AI"
     - "machine learning"
@@ -17,6 +19,8 @@ subscriptions:
   email: null
   enabled: true
   filter:
+    categories: []
+    companies: []
     keywords:
     - "solar"
     - "wind"

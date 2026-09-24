@@ -41,13 +41,42 @@ class SubscriptionValidatorTest {
         }
 
         @Test
-        @DisplayName("Returns error when keywords list is empty")
-        void validate_withEmptyKeywords_returnsError() {
-            var filter = SubscriptionTestFactory.filter(List.of(), List.of("TSLA"), "en");
+        @DisplayName("Returns error when keywords, tickers, companies, and categories are all empty")
+        void validate_withNoFilterCriteria_returnsError() {
+            var filter = SubscriptionTestFactory.filter(List.of(), List.of(), "en");
             var sub = SubscriptionTestFactory.subscription("sub-2", filter, true);
             var result = validator.validate(sub, List.of());
             assertTrue(result.isPresent());
-            assertEquals("At least one keyword must be specified.", result.get());
+            assertEquals("At least one of keywords, tickers, companies, or categories must be specified.", result.get());
+        }
+
+        @Test
+        @DisplayName("Accepts a filter with only tickers and no keywords")
+        void validate_withOnlyTickers_returnsEmptyResult() {
+            var filter = SubscriptionTestFactory.filter(List.of(), List.of("TSLA"), "en");
+            var sub = SubscriptionTestFactory.subscription("sub-2b", filter, true);
+            var result = validator.validate(sub, List.of());
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        @DisplayName("Accepts a filter with only companies and no keywords or tickers")
+        void validate_withOnlyCompanies_returnsEmptyResult() {
+            var filter = SubscriptionTestFactory.filter(List.of(), List.of(), "en");
+            filter.setCompanies(List.of("Tesla"));
+            var sub = SubscriptionTestFactory.subscription("sub-2c", filter, true);
+            var result = validator.validate(sub, List.of());
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        @DisplayName("Accepts a filter with only categories and no keywords or tickers")
+        void validate_withOnlyCategories_returnsEmptyResult() {
+            var filter = SubscriptionTestFactory.filter(List.of(), List.of(), "en");
+            filter.setCategories(List.of("AI"));
+            var sub = SubscriptionTestFactory.subscription("sub-2d", filter, true);
+            var result = validator.validate(sub, List.of());
+            assertTrue(result.isEmpty());
         }
 
         @Test

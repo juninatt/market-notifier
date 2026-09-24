@@ -47,12 +47,19 @@ public class SubscriptionValidator {
         if (candidate == null) return "Subscription cannot be null.";
         if (candidate.getFilter() == null) return "Subscription filter cannot be null.";
 
-        if (candidate.getFilter().getKeywords() == null || candidate.getFilter().getKeywords().isEmpty()) {
-            return "At least one keyword must be specified.";
+        if (isEmpty(candidate.getFilter().getKeywords())
+                && isEmpty(candidate.getFilter().getTickers())
+                && isEmpty(candidate.getFilter().getCompanies())
+                && isEmpty(candidate.getFilter().getCategories())) {
+            return "At least one of keywords, tickers, companies, or categories must be specified.";
         }
         if (candidate.getFilter().getLanguage() == null || candidate.getFilter().getLanguage().isBlank()) {
             return "Language must be specified.";
         }
         return null;
+    }
+
+    private boolean isEmpty(List<String> values) {
+        return values == null || values.isEmpty();
     }
 }

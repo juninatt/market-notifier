@@ -13,8 +13,13 @@ import java.util.List;
 /**
  * Defines the filtering rules of a {@link Subscription}.
  * <p>
- * A filter specifies which items are included in a subscription based on
- * keywords, stock tickers, and the preferred language.
+ * {@code keywords}, {@code tickers}, and {@code language} are matched together: each
+ * non-empty one must match for an item to be included (see {@code SubscriptionFilterMatcher}).
+ * {@code companies} and {@code categories} are independent of that and of each other:
+ * {@code companies} matches an item on ticker OR name with no upper limit on results, and
+ * {@code categories} matches free-text topics, capped to the most recently published items
+ * per category. Both are meant to be hand-edited directly in the subscriptions file rather
+ * than set through the Telegram/email subscribe commands.
  */
 @Getter
 @Setter
@@ -28,6 +33,8 @@ public class SubscriptionFilter {
     private List<@NotBlank String> tickers;
     @Pattern(regexp = "^[a-z]{2}(-[A-Z]{2})?$", message = "Language must be ISO code like 'en' or 'sv-SE'")
     private String language;
+    private List<String> companies = List.of();
+    private List<String> categories = List.of();
 
     @Override
     public String toString() {
@@ -35,6 +42,8 @@ public class SubscriptionFilter {
                 "keywords=" + keywords +
                 ", tickers=" + tickers +
                 ", language='" + language + '\'' +
+                ", companies=" + companies +
+                ", categories=" + categories +
                 '}';
     }
 }

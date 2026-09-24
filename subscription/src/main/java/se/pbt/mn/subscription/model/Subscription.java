@@ -20,6 +20,10 @@ import java.util.TimeZone;
  * <p>
  * {@code email} is optional -- when set, the subscription is also (or instead) delivered
  * via the email channel, in addition to Telegram via {@code chatId}.
+ * <p>
+ * {@code schedule} is also optional: a subscription with no schedule is never picked up by
+ * the recurring {@code NewsDispatchScheduler}, but is still included when the application is
+ * run in the {@code digest-now} profile, which sends every enabled subscription once and exits.
  */
 // TODO: Replace constructor with builder annotation
 @Getter
@@ -33,7 +37,6 @@ public class Subscription {
     private long chatId;
     @Email
     private String email;
-    @NotNull
     private SchedulePreset schedule;
     @NotNull
     private TimeZone timezone;
