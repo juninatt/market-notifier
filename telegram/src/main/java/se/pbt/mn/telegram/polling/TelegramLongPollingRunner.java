@@ -4,6 +4,7 @@ import tools.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import se.pbt.mn.telegram.client.TelegramApiClient;
@@ -18,9 +19,13 @@ import java.util.Optional;
  * <p>
  * Keeps the application responsive to inbound Telegram updates and translates
  * them into {@link TelegramCommand} objects for downstream handling.
+ * <p>
+ * Excluded under the {@code digest-now} profile, which sends every enabled subscription
+ * once and exits without listening for inbound commands.
  */
 // TODO: Centralize hardcoded values
 @Component
+@Profile("!digest-now")
 public class TelegramLongPollingRunner implements SmartLifecycle {
 
     private static final Logger log = LoggerFactory.getLogger(TelegramLongPollingRunner.class);

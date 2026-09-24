@@ -2,6 +2,7 @@ package se.pbt.mn.dispatch.scheduler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import se.pbt.mn.core.news.NewsGroup;
@@ -12,6 +13,7 @@ import se.pbt.mn.core.subscription.SchedulePreset;
 import se.pbt.mn.dispatch.fetch.NewsFetcher;
 import se.pbt.mn.dispatch.grouping.NewsGrouper;
 import se.pbt.mn.dispatch.matching.SubscriptionGroupMatcher;
+import se.pbt.mn.dispatch.notification.ChannelRecipientResolver;
 import se.pbt.mn.dispatch.notification.NotificationBuilder;
 import se.pbt.mn.subscription.model.Subscription;
 import se.pbt.mn.subscription.service.SubscriptionService;
@@ -30,8 +32,12 @@ import java.util.List;
  * {@link SchedulePreset#getZone()}); {@link Subscription#getTimezone()} is not applied on
  * top of that yet -- every subscriber on a given preset fires at the same instant
  * regardless of their own timezone setting.
+ * <p>
+ * Excluded under the {@code digest-now} profile, which sends every enabled subscription
+ * once and exits rather than running an ongoing recurring schedule.
  */
 @Component
+@Profile("!digest-now")
 public class NewsDispatchScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(NewsDispatchScheduler.class);
@@ -93,15 +99,7 @@ public class NewsDispatchScheduler {
         }
     }
 
-    /**
-     * Resolves the address a given channel should deliver to for this subscription, or
-     * null if the subscriber hasn't configured that channel (e.g. no email set).
-     */
     private String resolveRecipient(NotificationChannel channel, Subscription subscription) {
-        return switch (channel.id()) {
-            case "telegram" -> subscription.getChatId() > 0 ? String.valueOf(subscription.getChatId()) : null;
-            case "email" -> subscription.getEmail();
-            default -> null;
-        };
+        return ChannelRecipientResolver.resolve(channel, subscription);
     }
 }

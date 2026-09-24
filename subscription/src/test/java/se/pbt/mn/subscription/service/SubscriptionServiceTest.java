@@ -252,4 +252,42 @@ class SubscriptionServiceTest {
             assertTrue(result.isEmpty());
         }
     }
+
+    @Nested
+    @DisplayName("Finding all enabled subscriptions")
+    class FindAllEnabled {
+
+        @Test
+        @DisplayName("Returns every enabled subscription regardless of schedule, including one with none")
+        void findAllEnabled_withMixedSubscriptions_returnsOnlyEnabled() {
+            var filter = SubscriptionTestFactory.filter(List.of("Tech"), List.of("TSLA"), "en");
+
+            var withSchedule = SubscriptionTestFactory.subscription("sub-1", filter, true);
+            withSchedule.setSchedule(SchedulePreset.MORNING);
+
+            var withoutSchedule = SubscriptionTestFactory.subscription("sub-2", filter, true);
+
+            var disabled = SubscriptionTestFactory.subscription("sub-3", filter, false);
+            disabled.setSchedule(SchedulePreset.MORNING);
+
+            when(storage.loadSubscriptions(anyString()))
+                    .thenReturn(List.of(withSchedule, withoutSchedule, disabled));
+
+            var result = service.findAllEnabled();
+
+            assertEquals(2, result.size());
+            assertTrue(result.stream().anyMatch(s -> s.getId().equals("sub-1")));
+            assertTrue(result.stream().anyMatch(s -> s.getId().equals("sub-2")));
+        }
+
+        @Test
+        @DisplayName("Returns empty list when nothing is enabled")
+        void findAllEnabled_withNothingEnabled_returnsEmptyList() {
+            when(storage.loadSubscriptions(anyString())).thenReturn(List.of());
+
+            var result = service.findAllEnabled();
+
+            assertTrue(result.isEmpty());
+        }
+    }
 }

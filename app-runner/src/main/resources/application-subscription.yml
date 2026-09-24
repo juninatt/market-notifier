@@ -1,3 +1,6 @@
 subscription:
   storage:
     path: "subscriptions/subscriptions.yml"
+
+digest:
+  top-per-category: ${DIGEST_TOP_PER_CATEGORY:10}

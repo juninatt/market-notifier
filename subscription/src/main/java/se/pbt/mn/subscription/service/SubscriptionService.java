@@ -101,6 +101,20 @@ public class SubscriptionService {
     }
 
     /**
+     * Returns every enabled subscription regardless of its schedule (including one with no
+     * schedule at all). Used by the {@code digest-now} profile's one-off run, which sends
+     * every enabled subscription once rather than waiting for a scheduled preset to fire.
+     */
+    public List<Subscription> findAllEnabled() {
+        List<Subscription> all = Optional.ofNullable(storage.loadSubscriptions(storageProperties.getPath()))
+                .orElseGet(List::of);
+
+        return all.stream()
+                .filter(Subscription::isEnabled)
+                .toList();
+    }
+
+    /**
      * Removes a subscription from storage by matching ID or keyword within a chat.
      * <p>
      * Performs a case-insensitive comparison and updates storage if a match is found.

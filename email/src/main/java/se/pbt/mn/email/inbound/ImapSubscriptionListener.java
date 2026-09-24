@@ -6,6 +6,7 @@ import jakarta.mail.search.FlagTerm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import se.pbt.mn.core.subscription.ParsedSubscribeCommand;
 import se.pbt.mn.core.subscription.SubscribeCommand;
@@ -25,8 +26,12 @@ import java.util.Properties;
  * A message's body is parsed with the same {@link SubscribeCommandParser} used for Telegram's
  * /subscribe command. The sender's own address is used as the delivery email unless the body
  * explicitly specifies a different trailing address.
+ * <p>
+ * Excluded under the {@code digest-now} profile, which sends every enabled subscription
+ * once and exits without listening for inbound subscribe emails.
  */
 @Component
+@Profile("!digest-now")
 public class ImapSubscriptionListener implements SmartLifecycle {
 
     private static final Logger log = LoggerFactory.getLogger(ImapSubscriptionListener.class);
@@ -160,7 +165,7 @@ public class ImapSubscriptionListener implements SmartLifecycle {
             body = extractText(message);
             processMessage(from, body);
         } catch (Exception e) {
-            log.warn("Failed to process inbound subscription email: {} (raw body: '{}')", e.toString(), body);
+            log.warn("Failed to process inbound subscription email: {} (raw body: '{}')", e, body);
         } finally {
             try {
                 message.setFlag(Flags.Flag.SEEN, true);
