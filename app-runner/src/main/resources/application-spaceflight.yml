@@ -1,0 +1,3 @@
+spaceflight:
+  api:
+    base-url: https://api.spaceflightnewsapi.net/v4
