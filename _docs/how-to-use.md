@@ -45,7 +45,7 @@ Examples
 
 Notes:
 * If [schedule] is omitted, `morning_evening` will be applied automatically.
-* Each preset fires in its own configured timezone -- see the [README](../README.md) for details.
+* Each preset fires in its own configured timezone — see the [README](../README.md) for details.
 * Each subscription is stored in the subscriptions.yml file and linked to your Telegram chat ID (and, if provided, your email address).
 
 **Subscribing by email instead:** if IMAP polling is configured (see the README), you can create
@@ -120,8 +120,8 @@ Market Notifier also works in Telegram groups or channels:
 - Subscriptions are saved locally in `subscriptions/subscriptions.yml` (configurable via `subscription.storage.path`).
 - Each chat (private or group) has its own section in the file.
 - News delivery frequency is defined by each subscription's schedule preset, dispatched by `NewsDispatchScheduler`.
-- `/subscribe` only sets `keywords`, `tickers`, and `language`. Two more filter fields --
+- `/subscribe` only sets `keywords`, `tickers`, and `language`. Two more filter fields —
   `companies` (matches ticker or name, uncapped) and `categories` (top-N most recent per
-  category) -- exist only for hand-editing `subscriptions.yml` directly; see the main
+  category) — exist only for hand-editing `subscriptions.yml` directly; see the main
   [README](../README.md) for their syntax and the `digest-now` profile that sends every
   enabled subscription immediately instead of waiting for its schedule.
