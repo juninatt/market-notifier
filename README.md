@@ -161,12 +161,16 @@ subscriptions:
 - `schedule` — optional. Omit it entirely for a subscription that should never fire on the
   recurring scheduler and only ever be sent by the `digest-now` profile below.
 
+At each scheduled time, a subscription receives one digest: its `keywords`/`tickers` matches,
+its `companies` matches, and its `categories` matches, each in its own section. An article is
+listed once, in the first section it matches. Telegram and email receive the exact same digest,
+and a digest too long for a single Telegram message is split across several.
+
 ### 4) The `digest-now` profile: send everything right now, once, and exit
 
 Instead of waiting for a subscription's `schedule` to fire, you can run the application in the
-`digest-now` Spring profile: it sends every **enabled** subscription its own digest exactly
-once — combining its regular `keywords`/`tickers` matches, its `companies` matches, and its
-`categories` matches into a single message — then exits the process. The recurring scheduler,
+`digest-now` Spring profile: it sends every **enabled** subscription the same digest its
+schedule would have sent, exactly once, then exits the process. The recurring scheduler,
 Telegram polling, and IMAP polling are all excluded under this profile, so nothing else starts
 in the background.
 
@@ -218,7 +222,7 @@ This will:
 
 1. Load the main configuration from `app-runner/resources/application.yml`.
 2. Import module-specific configurations for Telegram, Finnhub, Marketaux, subscriptions, and email.
-3. Initialize all services and start the news dispatch scheduler, which checks every minute for a due schedule preset, fetches and groups news from all sources, and delivers matching items to each subscription's configured channels.
+3. Initialize all services and start the news dispatch scheduler, which checks every minute for a due schedule preset, fetches and groups news from all sources, and sends each due subscription its digest through its configured channels.
 
 Run with `-Dspring-boot.run.profiles=digest-now` instead to skip the recurring scheduler
 entirely and send every enabled subscription's digest once immediately — see

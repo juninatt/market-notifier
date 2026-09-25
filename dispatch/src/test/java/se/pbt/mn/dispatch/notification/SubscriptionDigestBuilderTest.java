@@ -14,6 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -180,6 +181,62 @@ class SubscriptionDigestBuilderTest {
             assertTrue(body.contains("Volvo unveils new model"));
             assertTrue(body.contains("Tesla rallies"));
             assertTrue(body.contains("Space telescope launched"));
+        }
+
+        @Test
+        @DisplayName("Lists a group once, in the first section it matches, even if later ones match too")
+        void build_withGroupMatchingSeveralSections_listsItOnce() {
+            var groups = List.of(group(item("1", "Tesla rallies", List.of("TSLA"), Instant.EPOCH)));
+            var subscription = subscription(List.of("Tesla"), List.of(), List.of("TSLA"), List.of("rallies"), 10);
+
+            var result = SubscriptionDigestBuilder.build(groups, subscription, 10);
+
+            assertTrue(result.isPresent());
+            String body = result.get().body();
+            assertEquals("MATCHES\nTesla rallies\nhttps://example.com/1\nSources: Example", body);
+        }
+
+        @Test
+        @DisplayName("Fills a category's limit from groups not already listed in an earlier section")
+        void build_withCategoryOverlappingCompanies_fillsLimitFromUnlistedGroups() {
+            Instant now = Instant.now();
+            var groups = List.of(
+                    group(item("1", "Tesla AI chip unveiled", List.of("TSLA"), now)),
+                    group(item("2", "AI startup raises funding", List.of(), now.minus(1, ChronoUnit.DAYS)))
+            );
+            var subscription = subscription(List.of(), List.of(), List.of("TSLA"), List.of("AI"), 10);
+
+            var result = SubscriptionDigestBuilder.build(groups, subscription, 1);
+
+            assertTrue(result.isPresent());
+            String body = result.get().body();
+            assertTrue(body.contains("COMPANIES\nTesla AI chip unveiled"));
+            assertTrue(body.contains("AI\nAI startup raises funding"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Item presentation")
+    class Presentation {
+
+        @Test
+        @DisplayName("Lists every distinct source in a group after its title and link")
+        void build_withGroupFromSeveralSources_listsEverySource() {
+            Instant now = Instant.now();
+            var reuters = new NewsItem(
+                    "Tesla rallies", "desc", URI.create("https://example.com/1"), null,
+                    now, "Reuters", List.of("TSLA"), Map.of(), new NewsItem.ProviderRef("test", "1"), null);
+            var marketWatch = new NewsItem(
+                    "Tesla stock jumps", "desc", URI.create("https://example.com/2"), null,
+                    now.plus(1, ChronoUnit.HOURS), "MarketWatch", List.of("TSLA"), Map.of(),
+                    new NewsItem.ProviderRef("test", "2"), null);
+            var groups = List.of(new NewsGroup(List.of(reuters, marketWatch)));
+            var subscription = subscription(List.of("Tesla"), List.of(), List.of(), List.of(), 10);
+
+            var result = SubscriptionDigestBuilder.build(groups, subscription, 10);
+
+            assertTrue(result.isPresent());
+            assertEquals("MATCHES\nTesla rallies\nhttps://example.com/1\nSources: Reuters, MarketWatch", result.get().body());
         }
     }
 }

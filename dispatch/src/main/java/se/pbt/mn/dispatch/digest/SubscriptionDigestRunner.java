@@ -9,18 +9,12 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import se.pbt.mn.core.news.NewsGroup;
-import se.pbt.mn.core.notification.Notification;
-import se.pbt.mn.core.notification.NotificationChannel;
-import se.pbt.mn.dispatch.config.SubscriptionDigestProperties;
 import se.pbt.mn.dispatch.fetch.NewsFetcher;
 import se.pbt.mn.dispatch.grouping.NewsGrouper;
-import se.pbt.mn.dispatch.notification.ChannelRecipientResolver;
-import se.pbt.mn.dispatch.notification.SubscriptionDigestBuilder;
 import se.pbt.mn.subscription.model.Subscription;
 import se.pbt.mn.subscription.service.SubscriptionService;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Sends every enabled subscription its digest exactly once, then exits the application --
@@ -29,10 +23,9 @@ import java.util.Optional;
  * which also excludes the recurring scheduler and the Telegram/IMAP listeners so nothing
  * else starts in the background.
  * <p>
- * Unlike the recurring {@code NewsDispatchScheduler}, which delivers one notification per
- * matched group, this sends one consolidated {@link Notification} per subscription (built by
- * {@link SubscriptionDigestBuilder}) -- the point is a single "catch me up now" message, not
- * a stream of individual articles.
+ * Delivery goes through the same {@link SubscriptionDigestSender} as the recurring
+ * {@code NewsDispatchScheduler}, so a subscription gets the same digest either way -- this
+ * just sends it now, for every enabled subscription, regardless of schedule.
  */
 @Component
 @Profile("digest-now")
@@ -42,21 +35,18 @@ public class SubscriptionDigestRunner implements ApplicationRunner {
 
     private final SubscriptionService subscriptionService;
     private final NewsFetcher newsFetcher;
-    private final List<NotificationChannel> channels;
-    private final SubscriptionDigestProperties properties;
+    private final SubscriptionDigestSender digestSender;
     private final ConfigurableApplicationContext context;
 
     public SubscriptionDigestRunner(
             SubscriptionService subscriptionService,
             NewsFetcher newsFetcher,
-            List<NotificationChannel> channels,
-            SubscriptionDigestProperties properties,
+            SubscriptionDigestSender digestSender,
             ConfigurableApplicationContext context
     ) {
         this.subscriptionService = subscriptionService;
         this.newsFetcher = newsFetcher;
-        this.channels = channels;
-        this.properties = properties;
+        this.digestSender = digestSender;
         this.context = context;
     }
 
@@ -95,32 +85,8 @@ public class SubscriptionDigestRunner implements ApplicationRunner {
         }
 
         for (Subscription subscription : subscriptions) {
-            sendDigest(subscription, allGroups);
+            digestSender.send(subscription, allGroups);
         }
         return 0;
-    }
-
-    private void sendDigest(Subscription subscription, List<NewsGroup> allGroups) {
-        Optional<Notification> notification =
-                SubscriptionDigestBuilder.build(allGroups, subscription, properties.getTopPerCategory());
-        if (notification.isEmpty()) {
-            log.debug("Nothing matched for subscription {}, skipping", subscription.getId());
-            return;
-        }
-
-        boolean sent = false;
-        for (NotificationChannel channel : channels) {
-            String recipient = ChannelRecipientResolver.resolve(channel, subscription);
-            if (recipient != null) {
-                channel.send(recipient, notification.get());
-                sent = true;
-            }
-        }
-
-        if (sent) {
-            log.info("Sent digest for subscription {}", subscription.getId());
-        } else {
-            log.warn("Subscription {} matched but has no configured channel (chatId or email), skipping", subscription.getId());
-        }
     }
 }

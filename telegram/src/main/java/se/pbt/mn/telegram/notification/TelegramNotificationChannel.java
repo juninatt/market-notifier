@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import se.pbt.mn.core.notification.Notification;
 import se.pbt.mn.core.notification.NotificationChannel;
 import se.pbt.mn.telegram.client.TelegramApiClient;
+import se.pbt.mn.telegram.format.TelegramMessageSplitter;
 import se.pbt.mn.telegram.format.TelegramOutputFormatter;
 
 import java.time.ZoneId;
@@ -16,6 +17,9 @@ import java.util.stream.Collectors;
 /**
  * {@link NotificationChannel} implementation that delivers notifications as
  * Telegram messages via the existing {@link TelegramApiClient}.
+ * <p>
+ * A notification longer than Telegram's per-message limit is sent as several consecutive
+ * messages (see {@link TelegramMessageSplitter}) rather than being rejected or truncated.
  */
 @Component
 public class TelegramNotificationChannel implements NotificationChannel {
@@ -47,7 +51,9 @@ public class TelegramNotificationChannel implements NotificationChannel {
         }
 
         try {
-            apiClient.sendFormattedMessage(chatId, format(notification)).block();
+            for (String part : TelegramMessageSplitter.split(format(notification))) {
+                apiClient.sendFormattedMessage(chatId, part).block();
+            }
         } catch (Exception e) {
             log.error("Failed to send Telegram notification to chatId={}", chatId, e);
         }

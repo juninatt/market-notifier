@@ -49,9 +49,9 @@ class SubscriptionDigestRunnerTest {
         private final int[] capturedExitCode;
 
         TestableRunner(SubscriptionService subscriptionService, NewsFetcher newsFetcher,
-                       List<NotificationChannel> channels, SubscriptionDigestProperties properties,
-                       ConfigurableApplicationContext context, int[] capturedExitCode) {
-            super(subscriptionService, newsFetcher, channels, properties, context);
+                       SubscriptionDigestSender digestSender, ConfigurableApplicationContext context,
+                       int[] capturedExitCode) {
+            super(subscriptionService, newsFetcher, digestSender, context);
             this.capturedExitCode = capturedExitCode;
         }
 
@@ -65,8 +65,8 @@ class SubscriptionDigestRunnerTest {
         when(emailChannel.id()).thenReturn("email");
         capturedExitCode = new int[]{Integer.MIN_VALUE};
         runner = new TestableRunner(
-                subscriptionService, new NewsFetcher(List.of(source)), List.of(emailChannel),
-                properties, context, capturedExitCode);
+                subscriptionService, new NewsFetcher(List.of(source)),
+                new SubscriptionDigestSender(List.of(emailChannel), properties), context, capturedExitCode);
     }
 
     private static Subscription subscription(String id, String email, List<String> companies) {

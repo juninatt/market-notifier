@@ -83,14 +83,14 @@ to display a short description of all available commands.
 
 ## 🔄 5) Receive updates
 
-The bot automatically sends you the latest financial news based on your subscriptions, formatted with:
+At each scheduled time, the bot sends one digest per subscription with the latest financial news
+matching it. Each article in the digest is listed with:
 - Headline
-- Summary
-- Source and publish date
-- Related tickers
 - Direct link to the article
+- Every source that reported it
 
-If you added an email address when subscribing, the same update is also sent there.
+If you added an email address when subscribing, the exact same digest is also sent there. A digest
+too long for a single Telegram message arrives as several consecutive messages.
 
 Delivery happens at regular intervals based on the app’s scheduler configuration.
 

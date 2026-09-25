@@ -7,14 +7,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import se.pbt.mn.core.news.NewsGroup;
 import se.pbt.mn.core.news.NewsItem;
-import se.pbt.mn.core.notification.Notification;
-import se.pbt.mn.core.notification.NotificationChannel;
 import se.pbt.mn.core.subscription.SchedulePreset;
+import se.pbt.mn.dispatch.digest.SubscriptionDigestSender;
 import se.pbt.mn.dispatch.fetch.NewsFetcher;
 import se.pbt.mn.dispatch.grouping.NewsGrouper;
-import se.pbt.mn.dispatch.matching.SubscriptionGroupMatcher;
-import se.pbt.mn.dispatch.notification.ChannelRecipientResolver;
-import se.pbt.mn.dispatch.notification.NotificationBuilder;
 import se.pbt.mn.subscription.model.Subscription;
 import se.pbt.mn.subscription.service.SubscriptionService;
 
@@ -43,16 +39,16 @@ public class NewsDispatchScheduler {
     private static final Logger log = LoggerFactory.getLogger(NewsDispatchScheduler.class);
 
     private final NewsFetcher newsFetcher;
-    private final List<NotificationChannel> channels;
+    private final SubscriptionDigestSender digestSender;
     private final SubscriptionService subscriptionService;
 
     public NewsDispatchScheduler(
             NewsFetcher newsFetcher,
-            List<NotificationChannel> channels,
+            SubscriptionDigestSender digestSender,
             SubscriptionService subscriptionService
     ) {
         this.newsFetcher = newsFetcher;
-        this.channels = channels;
+        this.digestSender = digestSender;
         this.subscriptionService = subscriptionService;
     }
 
@@ -67,10 +63,11 @@ public class NewsDispatchScheduler {
     }
 
     /**
-     * Fetches all sources once, groups items that likely cover the same event, and
-     * delivers matching groups to every subscription due for the given preset.
+     * Fetches all sources once, groups items that likely cover the same event, and sends
+     * each subscription due for the given preset its digest -- the same one the
+     * {@code digest-now} profile would send it.
      */
-    void dispatch(SchedulePreset preset) {
+    public void dispatch(SchedulePreset preset) {
         List<Subscription> due = subscriptionService.findEnabledBySchedule(preset);
         if (due.isEmpty()) {
             return;
@@ -85,21 +82,7 @@ public class NewsDispatchScheduler {
         List<NewsGroup> allGroups = NewsGrouper.group(allNews);
 
         for (Subscription subscription : due) {
-            List<NewsGroup> matched = SubscriptionGroupMatcher.match(allGroups, subscription);
-
-            for (NewsGroup group : matched) {
-                Notification notification = NotificationBuilder.fromGroup(group);
-                for (NotificationChannel channel : channels) {
-                    String recipient = resolveRecipient(channel, subscription);
-                    if (recipient != null) {
-                        channel.send(recipient, notification);
-                    }
-                }
-            }
+            digestSender.send(subscription, allGroups);
         }
-    }
-
-    private String resolveRecipient(NotificationChannel channel, Subscription subscription) {
-        return ChannelRecipientResolver.resolve(channel, subscription);
     }
 }

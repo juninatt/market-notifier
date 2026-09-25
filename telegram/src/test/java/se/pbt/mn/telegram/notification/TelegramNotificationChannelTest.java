@@ -4,12 +4,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import reactor.core.publisher.Mono;
 import se.pbt.mn.core.notification.Notification;
 import se.pbt.mn.telegram.client.TelegramApiClient;
+import se.pbt.mn.telegram.format.TelegramMessageSplitter;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -128,6 +131,31 @@ class TelegramNotificationChannelTest {
 
             verify(apiClient).sendFormattedMessage(eq(CHAT_ID),
                     eq("📰 *Title*\n\nBody\n\n🔗 [Läs mer](https://example.com)"));
+        }
+    }
+
+    @Test
+    @DisplayName("Sends a notification over Telegram's length limit as several messages, in order")
+    void send_withBodyOverLengthLimit_sendsSeveralMessagesInOrder() {
+        List<String> entries = IntStream.range(0, 40)
+                .mapToObj(i -> "Entry " + i + " " + "x".repeat(150))
+                .toList();
+        String body = String.join("\n\n", entries);
+
+        channel.send(RECIPIENT, new Notification("Your subscription digest", body, null, null, null, List.of()));
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient, atLeast(2)).sendFormattedMessage(eq(CHAT_ID), captor.capture());
+        List<String> parts = captor.getAllValues();
+        parts.forEach(part -> assertTrue(part.length() <= TelegramMessageSplitter.MAX_MESSAGE_LENGTH));
+        assertTrue(parts.get(0).startsWith("📰 *Your subscription digest*"));
+
+        String joined = String.join("\n\n", parts);
+        int previous = -1;
+        for (String entry : entries) {
+            int index = joined.indexOf(entry);
+            assertTrue(index > previous, "missing or out of order: " + entry);
+            previous = index;
         }
     }
 
