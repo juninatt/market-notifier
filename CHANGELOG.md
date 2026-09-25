@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.2.0](https://github.com/juninatt/market-notifier/compare/v1.1.0...v1.2.0) (2026-09-25)
+
+
+### Features
+
+* **dispatch,telegram:** send the same subscription digest from the scheduler and digest-now ([8f4bae6](https://github.com/juninatt/market-notifier/commit/8f4bae6484f5b0c04c124e2f6cc843b057ba2136))
+* **dispatch:** add a digest-now profile that sends every enabled subscription once and exits ([e7dcb75](https://github.com/juninatt/market-notifier/commit/e7dcb758aeac8c98154ae9c2080fab8a3971ace7))
+* **dispatch:** match companies and categories against a subscription's filter ([7afef7b](https://github.com/juninatt/market-notifier/commit/7afef7b0fdbfc3fc3019386f17717ce1f069c1f8))
+* **dispatch:** send a one-off watchlist digest on startup ([861dbbd](https://github.com/juninatt/market-notifier/commit/861dbbd980314521b84806e88f485b278c3d6f16))
+* **sources:** add Spaceflight News as a news source ([30ab88e](https://github.com/juninatt/market-notifier/commit/30ab88ec34dd8764701749b03ab294c4b4459e9a))
+
+
+### Bug Fixes
+
+* **dispatch:** stop matching everything on empty or blank filter values ([ea3b40d](https://github.com/juninatt/market-notifier/commit/ea3b40da1834286c3aa5fee250f34f6e776fe3ce))
+* **telegram:** tolerate a missing bot token and chat ids at startup ([44b515a](https://github.com/juninatt/market-notifier/commit/44b515a33613630e8ba5ef2eb355c48ecc6ffffa))
+
 ## [1.1.0](https://github.com/juninatt/market-notifier/compare/v1.0.2...v1.1.0) (2026-09-18)
 
 
